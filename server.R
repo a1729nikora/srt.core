@@ -167,7 +167,8 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         
         # Subset the data according to the range we've specified.
         
-        ModeledData <<- tail(head(data_global(), input$modelDataRange[2]), (input$modelDataRange[2]-input$modelDataRange[1]+1))
+        ModeledData <<- NULL
+        ModeledData[[names(data_global())]] <<- tail(head(data_global()[[1]], input$modelDataRange[2]), (input$modelDataRange[2]-input$modelDataRange[1]+1))
         raw_data <<- data_global()
         ModeledDataName <<- data_set_global
         
@@ -182,13 +183,16 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         FailedModels <<- tempResultsList[["FailedModels"]]
         print("Failed Models")
         print(FailedModels)
+        
+        # Here we compute prequential likelihood and model bias for the models.
+        
         # Update the model results selection pull-downs with the names of the
         # models that have been successfully run.
         
-        ModelsToShow <- as.list(SuccessfulModels)
+        ModelsToShow <- as.list(SuccessfulModels[["MLE"]])
         ModelsToShowNames <- c()
         for (ModelsToShowIndex in 1:length(ModelsToShow)) {
-          ModelsToShowNames <- c(ModelsToShowNames, get(paste(SuccessfulModels[ModelsToShowIndex], "fullname", sep="_"))) 
+          ModelsToShowNames <- c(ModelsToShowNames, get(paste(SuccessfulModels[["MLE"]][ModelsToShowIndex], "fullname", sep="_"))) 
         }
         names(ModelsToShow) <- ModelsToShowNames
         
@@ -197,7 +201,7 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         updateSelectInput(session, "modelResultsForEval", choices = ModelsToShow, selected=ModelsToShow[1])
         
         AllModelsRunNames <- c()
-        AllModelsRun <- sort(c(SuccessfulModels, FailedModels))
+        AllModelsRun <- sort(c(SuccessfulModels[["MLE"]], FailedModels[["MLE"]]))
         for (ModelsToShowIndex in 1:length(AllModelsRun)) {
           AllModelsRunNames <- c(AllModelsRunNames, get(paste(AllModelsRun[ModelsToShowIndex], "fullname", sep="_"))) 
         }
