@@ -86,7 +86,6 @@ DSS_MVF <- function(param,d){
   #}
   MVF <- param$DSS_aMLE*(1-exp(-1*d$FT*param$DSS_bMLE)*(1+param$DSS_bMLE*d$FT))
   r <- data.frame(d$FT,MVF,rep("DSS",n))
-  print(d$FT)
   names(r) <- c("Time","Failure","Model")
   r
 }
@@ -132,7 +131,6 @@ DSS_FT_lnL <- function(params,paramNames,negLnL,failData){ # ----> params should
   tn <- failData[n]
   firstSumTerm=0
   secondSumTerm = 0
-  
   for(i in 1:n){
     firstSumTerm = firstSumTerm + log(failData[i])
     secondSumTerm = secondSumTerm + (-as.list(params)$DSS_bMLE*failData[i])
@@ -246,7 +244,7 @@ DSS_Target_T <- function(params,cur_time,delta, reliability){
   }
   
   current_rel <- DSS_R_delta(params,cur_time,delta)
-  print(current_rel)
+  #print(current_rel)
   #print(params)
   if(current_rel < reliability){
     # Bound the estimation interval
