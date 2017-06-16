@@ -2,10 +2,10 @@
 
 #plot_model_results <- function(ModResults, DataModeled, DataSetName, DisplayModels, DataView, PlotView, PlotData, PlotDataEnd, RelMissionTime, plotWidthRange, plotHeightRange, plotPixels, AdditionalCurveLength) {
 #plot_model_results          (ModelResults, ModeledData, ModeledDataName, input$modelResultChoice, input$modelPlotChoice, input$ModelDataPlotType, input$checkboxDataOnPlot, input$checkboxDataEndOnPlot, input$modelRelMissionTime, MPranges$x, MPranges$y, session$clientData$output_ModelPlot_width, input$modelCurveAdditionalTime)
-plot_model_results <- function(ModResults, ModelsThatRan, DataModeled, DataSetName, input, plotWidthRange, plotHeightRange, plotPixels) {
+plot_model_results <- function(ModResults, ModelsThatRan, Data_Modeled, DataSetName, input, plotWidthRange, plotHeightRange, plotPixels) {
   require(ggplot2)
   
-  DataModeled <- DataModeled$FRate
+  DataModeled <- Data_Modeled$FRate
   DisplayModels <- input$modelResultChoice
   DataView <- input$modelPlotChoice
   PlotView <- input$ModelDataPlotType
