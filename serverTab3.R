@@ -10,127 +10,155 @@
 
 
   tab3_table1_construct <- function(model,data,input){
-    if(dataType(names(data))=="FR"){
-      #print("Constructing table 3")
-      last_row <- length(ModelResults[,1]) - PredAheadSteps
-      model_params <- as.data.frame(matrix(0, ncol=length(ModelResults[1,]), nrow = 1))
-      colnames(model_params) <- colnames(ModelResults)
-      
-      #Generating model_params from ModelResults. If the column is a list, it is converted to numeric
-      for(i in 1:length(model_params[1,])){
-        if (typeof(model_params[1,i]) == "list"){
-            model_params[1, i] <- as.numeric(ModelResults[1,i][[1]])
-        }
-        else{
-            model_params[1, i] <- ModelResults[last_row, i]
-        }
-      }
-      
-      
-      if(typeof(model_params)!="character"){
-        number_fails <- get_prediction_k( model,
-                                          model_params, 
-                                          input$modelDetailPredTime, 
-                                          #data$FT[length(get("data")[[get(paste(model,"input",sep="_"))]])],
-                                          data$FRate$FT[last_row],
-                                          #length(get("data")[[get(paste(model,"input",sep="_"))]])
-                                          last_row)
-        
-        time_fails <- get_prediction_t( model,
-                                        model_params, 
-                                        input$modelDetailPredFailures,
-                                        #data$FT[length(get("data")[[get(paste(model,"input",sep="_"))]])],
-                                        data$FRate$FT[last_row],
-                                        #length(get("data")[[get(paste(model,"input",sep="_"))]]))
-                                        last_row)
-        rel_time <- get_reliability_t(model,
-                                      model_params, 
-                                      input$modelTargetReliability, input$modelRelMissionTime2, 
-                                      #data$FT[length(get("data")[[get(paste(model,"input",sep="_"))]])],
-                                      data$FRate$FT[last_row],
-                                      #length(get("data")[[get(paste(model,"input",sep="_"))]]))
-                                      last_row)
+    ConfIntSuffixes <- c("Low", "MLE", "High")
+    
+    DisplayOnQueryTable <- list("Low"=input$LowConfOnQueryTbl, "MLE"=input$MLEOnQueryTbl, "High"=input$HighConfOnQueryTbl)
 
-        opt_release_time <- get_optimal_release_time_CC(model, model_params, input$C0, input$C1, input$C2)
-        cost_at_rel_time <- get_cost_at_time(model,model_params, rel_time, input$T, input$C0, input$C1, input$C2)
-        #cost_at_rel_time <- 0
-        reliability_at_opt_release_time <- get_rel_at_opt_release_time(model, model_params, opt_release_time, input$modelRelMissionTime)
-        cost_at_opt_release_time <- get_cost_at_time(model,model_params, opt_release_time, input$T, input$C0, input$C1, input$C2)
-        
-
-        # opt_release_time <- input$C0 + input$C1 + input$C2
-        #print(time_fails)
-        #print(number_fails)
-        #print(rel_time)
-        #print(opt_release_time)
-
-      
-
-        ExpectedNumFailuresExceeded <- FALSE
-        for( i in 1:length(time_fails)){
-          if(!ExpectedNumFailuresExceeded){
-            count <<- count+1
+    for (SuffixTag in ConfIntSuffixes) {
+      if (DisplayOnQueryTable[[SuffixTag]]) {
+        if (any(FailedModels[[SuffixTag]] == model)) {
+          count<<-count+1
+          tab3_table1[count,1]<<- paste(get(paste0(model, "_fullname")), SuffixTag, sep=":")
+          tab3_table1[count,2] <<- "Unavailable"
+          tab3_table1[count,3] <<- "Unavailable"
+          tab3_table1[count,4] <<- "Unavailable"
+          tab3_table1[count,5] <<- "Unavailable"
+          tab3_table1[count,6] <<- "Unavailable"
+          tab3_table1[count,7] <<- "Unavailable"
+          tab3_table1[count,8] <<- "Unavailable"
+          tab3_table1[count,9] <<- "Unavailable"
+        } else {
+          if(dataType(names(data))=="FR"){
+            #print("Constructing table 3")
+            last_row <- length(ModelResults[,1]) - PredAheadSteps
+            model_params_label <- paste(model,"params",sep="_")
+            model_params <- as.data.frame(matrix(0, ncol=length(get(model_params_label)), nrow = 1))
             
-            if(i == 1) {
-              tab3_table1[count,1]<<- get(paste0(model, "_fullname"))
-              tab3_table1[count,2]<<- as.character(rel_time)
-              tab3_table1[count,3]<<- number_fails
+            #Generating model_params from ModelResults. If the column is a list, it is converted to numeric
+            #for(i in 1:length(model_params[1,])){
+            #  if (typeof(model_params[1,i]) == "list"){
+            #      model_params[1, i] <- as.numeric(ModelResults[1,i][[1]])
+            #  }
+            #  else{
+            #      model_params[1, i] <- ModelResults[last_row, i]
+            #  }
+            #}
+            
+            parmNames <- c()
+            for (paramNum in 1:length(get(model_params_label))) {
+              model_parm_num <- paste0(model, "_", get(model_params_label)[paramNum], "_", SuffixTag)
+              parmNames <- c(parmNames, model_parm_num)
+              model_params[1,paramNum] <- ModelResults[[model_parm_num]][last_row]
+            }
+            colnames(model_params) <- parmNames
+            
+            if(typeof(model_params)!="character"){
+              number_fails <- get_prediction_k( model,
+                                                model_params, 
+                                                input$modelDetailPredTime, 
+                                                #data$FT[length(get("data")[[get(paste(model,"input",sep="_"))]])],
+                                                data$FRate$FT[last_row],
+                                                #length(get("data")[[get(paste(model,"input",sep="_"))]])
+                                                last_row)
               
-            } else {
-              tab3_table1[count,2]<<- " "
-              tab3_table1[count,3]<<- " "
+              time_fails <- get_prediction_t( model,
+                                              model_params, 
+                                              input$modelDetailPredFailures,
+                                              #data$FT[length(get("data")[[get(paste(model,"input",sep="_"))]])],
+                                              data$FRate$FT[last_row],
+                                              #length(get("data")[[get(paste(model,"input",sep="_"))]]))
+                                              last_row)
+              rel_time <- get_reliability_t(model,
+                                            model_params, 
+                                            input$modelTargetReliability, input$modelRelMissionTime2, 
+                                            #data$FT[length(get("data")[[get(paste(model,"input",sep="_"))]])],
+                                            data$FRate$FT[last_row],
+                                            #length(get("data")[[get(paste(model,"input",sep="_"))]]))
+                                            last_row)
+              
+              opt_release_time <- get_optimal_release_time_CC(model, model_params, input$C0, input$C1, input$C2)
+              cost_at_rel_time <- get_cost_at_time(model,model_params, rel_time, input$T, input$C0, input$C1, input$C2)
+              #cost_at_rel_time <- 0
+              reliability_at_opt_release_time <- get_rel_at_opt_release_time(model, model_params, opt_release_time, input$modelRelMissionTime)
+              cost_at_opt_release_time <- get_cost_at_time(model,model_params, opt_release_time, input$T, input$C0, input$C1, input$C2)
+              
+              
+              # opt_release_time <- input$C0 + input$C1 + input$C2
+              #print(time_fails)
+              #print(number_fails)
+              #print(rel_time)
+              #print(opt_release_time)
+              
+              
+              
+              ExpectedNumFailuresExceeded <- FALSE
+              for( i in 1:length(time_fails)){
+                if(!ExpectedNumFailuresExceeded){
+                  count <<- count+1
+                  
+                  if(i == 1) {
+                    tab3_table1[count,1]<<- paste(get(paste0(model, "_fullname")), SuffixTag, sep=":")
+                    tab3_table1[count,2]<<- as.character(rel_time)
+                    tab3_table1[count,3]<<- number_fails
+                    
+                  } else {
+                    tab3_table1[count,2]<<- " "
+                    tab3_table1[count,3]<<- " "
+                  }
+                  
+                  
+                  tab3_table1[count,4]<<- i
+                  tab3_table1[count,5]<<- time_fails[i]
+                  
+                  if(i==1) {
+                    tab3_table1[count,6]<<- opt_release_time
+                    tab3_table1[count,7]<<- cost_at_rel_time
+                    tab3_table1[count,8]<<- reliability_at_opt_release_time
+                    tab3_table1[count,9]<<- cost_at_opt_release_time
+                  }
+                  
+                  #  Create Row of NA only once logic
+                  if(time_fails[i]=="NA"){
+                    ExpectedNumFailuresExceeded <- TRUE
+                    break
+                  }
+                }
+              }
             }
-
-
-            tab3_table1[count,4]<<- i
-            tab3_table1[count,5]<<- time_fails[i]
-            
-            if(i==1) {
-              tab3_table1[count,6]<<- opt_release_time
-              tab3_table1[count,7]<<- cost_at_rel_time
-              tab3_table1[count,8]<<- reliability_at_opt_release_time
-              tab3_table1[count,9]<<- cost_at_opt_release_time
+            else if(typeof(model_params)=="character"){
+              if(length(grep("not found",model_params))){
+                count<<-count+1
+                tab3_table1[count,1] <<- model
+                tab3_table1[count,2] <<- "Given-model not defined"
+                tab3_table1[count,3] <<- "Given-model not defined"
+                tab3_table1[count,4] <<- "Given-model not defined"
+                tab3_table1[count,5] <<- "Given-model not defined"
+                tab3_table1[count,6] <<- "Given-model not defined"
+                tab3_table1[count,7] <<- "Given-model not defined"
+                tab3_table1[count,8] <<- "Given-model not defined"
+                tab3_table1[count,9] <<- "Given-model not defined"
+              }
+              else{
+                count<<-count+1
+                tab3_table1[count,1] <<- model
+                tab3_table1[count,2] <<- "NON-CONVERGENCE"
+                tab3_table1[count,3] <<- "NON-CONVERGENCE"
+                tab3_table1[count,4] <<- "NON-CONVERGENCE"
+                tab3_table1[count,5] <<- "NON-CONVERGENCE"
+                tab3_table1[count,6] <<- "NON-CONVERGENCE"
+                tab3_table1[count,7] <<- "NON-CONVERGENCE"
+                tab3_table1[count,8] <<- "NON-CONVERGENCE"
+                tab3_table1[count,9] <<- "NON-CONVERGENCE"
+              }
             }
-
-            #  Create Row of NA only once logic
-            if(time_fails[i]=="NA"){
-              ExpectedNumFailuresExceeded <- TRUE
-              break
-            }
-          }
-        }
+          } # End of FR data branch.
+          else{
+            # ----> FC data should be handled here
+          } # Endif - separate branches for FR and FC data.
+        } # Endif - do we have any models that can't be displayed?
       }
-      else if(typeof(model_params)=="character"){
-        if(length(grep("not found",model_params))){
-          count<<-count+1
-          tab3_table1[count,1] <<- model
-          tab3_table1[count,2] <<- "Given-model not defined"
-          tab3_table1[count,3] <<- "Given-model not defined"
-          tab3_table1[count,4] <<- "Given-model not defined"
-          tab3_table1[count,5] <<- "Given-model not defined"
-          tab3_table1[count,6] <<- "Given-model not defined"
-          tab3_table1[count,7] <<- "Given-model not defined"
-          tab3_table1[count,8] <<- "Given-model not defined"
-          tab3_table1[count,9] <<- "Given-model not defined"
-        }
-        else{
-          count<<-count+1
-          tab3_table1[count,1] <<- model
-          tab3_table1[count,2] <<- "NON-CONVERGENCE"
-          tab3_table1[count,3] <<- "NON-CONVERGENCE"
-          tab3_table1[count,4] <<- "NON-CONVERGENCE"
-          tab3_table1[count,5] <<- "NON-CONVERGENCE"
-          tab3_table1[count,6] <<- "NON-CONVERGENCE"
-          tab3_table1[count,7] <<- "NON-CONVERGENCE"
-          tab3_table1[count,8] <<- "NON-CONVERGENCE"
-          tab3_table1[count,9] <<- "NON-CONVERGENCE"
-        }
-      }
-    }
-    else{
-      # ----> FC data should be handled here
-    }
-  }
+    } # End for - do for MLE values and low and high CI values.
+  } # End function - tab3_table1_construct
 
   output$downloadData <- downloadHandler(
       filename <- function() {
@@ -236,24 +264,25 @@
 #Tab3 Plot Section
 ############################################################################### 
 output$ModelPredictionPlot <- renderPlot({
-      MRPlot <- NULL
+  MRPlot <- NULL
       if((length(input$modelDetailChoice) > 0) && (input$modelDetailChoice[1] != "None") && (!is.null(ModelResults)) && (!is.null(ModeledData))) {
-        last_row <- length(ModelResults[,1]) - PredAheadSteps
-        model_params <- as.data.frame(matrix(0, ncol=length(ModelResults[1,]), nrow = 1))
-        colnames(model_params) <- colnames(ModelResults)
+        #last_row <- length(ModelResults[,1]) - PredAheadSteps
+        #model_params <- as.data.frame(matrix(0, ncol=length(ModelResults[1,]), nrow = 1))
+        #colnames(model_params) <- colnames(ModelResults)
         #Generating model_params from ModelResults. If the column is a list, it is converted to numeric
-      for(i in 1:length(model_params[1,])){
-        if (typeof(model_params[1,i]) == "list"){
-            model_params[1, i] <- as.numeric(ModelResults[1,i][[1]])
-        }
-        else{
-            model_params[1, i] <- ModelResults[last_row, i]
-        }
-      }
+        #for(i in 1:length(model_params[1,])){
+        #  if (typeof(model_params[1,i]) == "list"){
+        #    model_params[1, i] <- as.numeric(ModelResults[1,i][[1]])
+        #  }
+        #  else{
+        #    model_params[1, i] <- ModelResults[last_row, i]
+        #  }
+        #}
       
         #MRPlot <- plot_model_prediction_results(input$modelDetailChoice, input$queryResultsPlotType, data_global(), input$C0, input$C1, input$C2, input$T)
-        MRPlot <- plot_model_prediction_results(input$modelDetailChoice, input$queryResultsPlotType, ModeledData, model_params, input$C0, input$C1, input$C2, input$T)
-      #   if(!is.null(MRPlot)) {
+        #MRPlot <- plot_model_prediction_results(input$modelDetailChoice, input$queryResultsPlotType, ModeledData, model_params, input$C0, input$C1, input$C2, input$T)
+        MRPlot <- plot_model_prediction_results(input$modelDetailChoice, SuccessfulModels, input$queryResultsPlotType, ModeledData, ModelResults, input$C0, input$C1, input$C2, input$T, input)
+        #   if(!is.null(MRPlot)) {
       #     MRPlot <- MRPlot + coord_cartesian(xlim = MPranges$x, ylim = MPranges$y)
       #   }
       }

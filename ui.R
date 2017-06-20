@@ -242,10 +242,10 @@ shinyUI(navbarPage("Software Reliability Assessment in R",
                                            textOutput("ModelConfigError"),
                                            textOutput("UnsuccessfulModels"),
                                            fluidRow (
-                                             column(6,
+                                             column(5,
                                                     h6("Show most likely parameter values or confidence bounds.")
                                              ),
-                                             column(1,
+                                             column(2,
                                                     checkboxInput("LowConfOnRsltPlot", label = "Low", value = FALSE)
                                              ),
                                              column(3,
@@ -387,11 +387,39 @@ shinyUI(navbarPage("Software Reliability Assessment in R",
                               mainPanel(
                                 tabsetPanel(
                                   tabPanel("Prediction table",
+                                           fluidRow(
+                                             column(5,
+                                                    h6("Show most likely parameter values or confidence bounds.")
+                                             ),
+                                             column(2,
+                                                    checkboxInput("LowConfOnQueryTbl", label = "Low", value = FALSE)
+                                             ),
+                                             column(3,
+                                                    checkboxInput("MLEOnQueryTbl", label = "Most Likely", value = TRUE)
+                                             ),
+                                             column(2,
+                                                    checkboxInput("HighConfOnQueryTbl", label = "High", value = FALSE)
+                                             )
+                                           ),
                                     DT::dataTableOutput('mytable1')
                                     ),
                                   tabPanel("Model Prediction Result Plot", 
                                     # textOutput("ModelConfigError"), 
                                     # textOutput("UnsuccessfulModels"), 
+                                    fluidRow(
+                                      column(5,
+                                             h6("Show most likely parameter values or confidence bounds.")
+                                      ),
+                                      column(2,
+                                             checkboxInput("LowConfOnQueryPlot", label = "Low", value = FALSE)
+                                      ),
+                                      column(3,
+                                             checkboxInput("MLEOnQueryPlot", label = "Most Likely", value = TRUE)
+                                      ),
+                                      column(2,
+                                             checkboxInput("HighConfOnQueryPlot", label = "High", value = FALSE)
+                                      )
+                                    ),
                                     plotOutput("ModelPredictionPlot", dblclick="MPdblclick1", brush=brushOpts(id="MP_brush1", resetOnNew=TRUE))
                                     ),
                                  # DT::dataTableOutput('mytable1')
