@@ -19,14 +19,14 @@
         if (any(FailedModels[[SuffixTag]] == model)) {
           count<<-count+1
           tab3_table1[count,1]<<- paste(get(paste0(model, "_fullname")), SuffixTag, sep=":")
-          tab3_table1[count,2] <<- "Unavailable"
-          tab3_table1[count,3] <<- "Unavailable"
-          tab3_table1[count,4] <<- "Unavailable"
-          tab3_table1[count,5] <<- "Unavailable"
-          tab3_table1[count,6] <<- "Unavailable"
-          tab3_table1[count,7] <<- "Unavailable"
-          tab3_table1[count,8] <<- "Unavailable"
-          tab3_table1[count,9] <<- "Unavailable"
+          tab3_table1[count,2] <<- "NON-CONVERGENCE"
+          tab3_table1[count,3] <<- "NON-CONVERGENCE"
+          tab3_table1[count,4] <<- "NON-CONVERGENCE"
+          tab3_table1[count,5] <<- "NON-CONVERGENCE"
+          tab3_table1[count,6] <<- "NON-CONVERGENCE"
+          tab3_table1[count,7] <<- "NON-CONVERGENCE"
+          tab3_table1[count,8] <<- "NON-CONVERGENCE"
+          tab3_table1[count,9] <<- "NON-CONVERGENCE"
         } else {
           if(dataType(names(data))=="FR"){
             #print("Constructing table 3")
