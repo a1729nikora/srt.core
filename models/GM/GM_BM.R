@@ -177,8 +177,8 @@ GM_FT_lnL<-function(params,paramNames,negLnL,failData){
     sum2=sum2+ (as.list(params)$GM_Phi^(i-1) * failData[i])
   }
   lnL <- n*log(as.list(params)$GM_D0) + sum1 - as.list(params)$GM_D0*sum2
-  if(negLnL==TRUE){
-    return(-lnL)
+  if(negLnL==FALSE){
+    return(lnL)
   }
   else {
     # This is the branch we take if we want to compute the hessian on
