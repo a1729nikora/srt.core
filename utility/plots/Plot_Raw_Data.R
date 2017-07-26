@@ -1,4 +1,4 @@
-plot_failure_data <- function(in_data, convertedFCData, DataName, DataRange, DataView, PlotType, MinIntervalWidth) {
+plot_failure_data <- function(fail_data_in, convertedFCData, DataName, DataRange, DataView, PlotType, MinIntervalWidth) {
   
   require(ggplot2)
   
@@ -6,14 +6,16 @@ plot_failure_data <- function(in_data, convertedFCData, DataName, DataRange, Dat
   
   DataIntervalStart <- DataRange[1]
   DataIntervalEnd <- DataRange[2]
+
+  if('FCount' %in% names(fail_data_in)){
+    in_data <- fail_data_in$FCount
+  } else if('FRate' %in% names(fail_data_in)){
+    in_data <- fail_data_in$FRate
+  }
+
   # Initialize the plot.
   
   localDataPlot <- ggplot()
-  if('FCount' %in% names(in_data)){
-    in_data <- in_data$FCount
-  } else if('FRate' %in% names(in_data)){
-    in_data <- in_data$FRate
-  }
   
   if((DataIntervalEnd - DataIntervalStart + 1) >= MinIntervalWidth) {
     localDataPlot <- ggplot(,aes_string(x="Index",y="FailureDisplayType"))
@@ -98,7 +100,7 @@ plot_failure_data <- function(in_data, convertedFCData, DataName, DataRange, Dat
         
         # Cumulative Failures vs. Elapsed Test Time
         
-        plot_data <- data.frame(c(0,CumT), c(0,CFC))
+        plot_data <- data.frame(c(CumT), c(CFC))
         localDataPlot <- localDataPlot+ggtitle(paste(c("Cumulative Failures vs. Cumulative Test Time of"),DataName))
         localDataPlot <- localDataPlot + scale_color_manual(name = "Legend",  labels = c("Cumulative Test Time", "Cumulative Number of Failures"),values = c("blue","red"))
         localDataPlot <- localDataPlot + xlab("Cumulative Test Time")+ylab("Cumulative Number of Failures")
