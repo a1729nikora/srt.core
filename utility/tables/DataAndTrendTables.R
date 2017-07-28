@@ -1,35 +1,59 @@
-data_or_trend_table <- function(inputData, DataRange, DataOrTrend, TrendTest) {
+data_or_trend_table <- function(fail_data_in, DataRange, DataOrTrend, TrendTest) {
   
-  in_data <- inputData
-  DataColNames <- names(in_data)
-  names(in_data) <- gsub("x.", "", DataColNames)
+  in_data <- fail_data_in
   
   D_or_T_table <- data.frame()
   TableCreateError <- FALSE
   
-  DataStart <- DataRange[1]
-  DataEnd <- DataRange[2]
+  # Are we working with failure counts or failure times data?
   
-  if (dataType(names(in_data)) == "FR") {
-    
-    IF <- tail(head(in_data$IF, DataEnd), (DataEnd-DataStart+1))
-    FT <- tail(head(in_data$FT, DataEnd), (DataEnd-DataStart+1))
-    FN <- tail(head(in_data$FN, DataEnd), (DataEnd-DataStart+1))
+  if("FCount" %in% names(in_data)){
+    # Working with failure counts data
     
     if (DataOrTrend == 1) {
+      # Create failure data table
       
-      # Create a table of the failure data
+      in_data <- in_data$FCount
       
-      D_or_T_table <- data.frame("Failure Number"=FN, "Times Between Failures"=IF, "Failure Time"=FT)
+      DataIntervalStart <- DataRange[1]
+      DataIntervalEnd <- DataRange[2]
       
+      DataColNames <- names(in_data)
+      names(in_data) <- gsub("x.", "", DataColNames)
+      
+      FC <- tail(head(in_data$FC, DataIntervalEnd), (DataIntervalEnd-DataIntervalStart+1))
+      CFC <- tail(head(in_data$CFC, DataIntervalEnd), (DataIntervalEnd-DataIntervalStart+1))
+      CumT <- tail(head(in_data$T, DataIntervalEnd), (DataIntervalEnd-DataIntervalStart+1))
+      
+      D_or_T_table <- data.frame("Cumulative Test Time"=CumT, "Failure Counts"=FC, "Cumulative Failure Count"=CFC)
     } else if (DataOrTrend == 2) {
+      # Create trend test table
       
-      # Create a table of the trend test
+      # Since the Laplace Test can't be computed for failure counts data
+      # if the intervals are of unequal length, we use the times between
+      # failures version of the data even if the original version is
+      # failure counts.
+
+      in_data <- in_data$FRate
+      
+      DataColNames <- names(in_data)
+      names(in_data) <- gsub("x.", "", DataColNames)
+      
+      if(DataRange[1]==1){
+        DataIntervalStart <- 1
+      } else {
+        DataIntervalStart <- fail_data_in$FCount$CFC[(DataRange[1]-1)+1]
+      }
+      DataIntervalEnd <- fail_data_in$FCount$CFC[DataRange[2]]
+      
+      IF <- tail(head(in_data$IF, DataIntervalEnd), (DataIntervalEnd-DataIntervalStart+1))
+      FT <- tail(head(in_data$FT, DataIntervalEnd), (DataIntervalEnd-DataIntervalStart+1))
+      FN <- tail(head(in_data$FN, DataIntervalEnd), (DataIntervalEnd-DataIntervalStart+1))
       
       if (TrendTest == "LP") {
         
         # Laplace Test
-
+        
         trendStat <- laplace_trend_test(IF)
         D_or_T_table <- data.frame("Failure Number"=FN, "Times Between Failures"=IF, "Laplace Test Statistic"=trendStat$Laplace_factor)
         
@@ -39,7 +63,6 @@ data_or_trend_table <- function(inputData, DataRange, DataOrTrend, TrendTest) {
         
         trendStat <- running_average_test(IF)
         D_or_T_table <- data.frame("Failure Number"=FN, "Times Between Failures"=IF, "Running Average IF Time"=trendStat$Running_Average)
-        
       } else {
         
         # Couldn't determine trend test type.
@@ -48,36 +71,33 @@ data_or_trend_table <- function(inputData, DataRange, DataOrTrend, TrendTest) {
         TableCreateError <- TRUE
       }
     } else {
-      
       # Couldn't determine whether to create a data or
       # trend test table.
       # #print an error message.
       
       TableCreateError <- TRUE
     }
-  } else if (dataType(names(in_data)) == "FC") {
+  } else if ("FRate" %in% names(in_data)) {
+    # Working with failure times data
     
-    FC <- tail(head(in_data$FC, DataEnd), (DataEnd-DataStart+1))
-    CFC <- tail(head(in_data$CFC, DataEnd), (DataEnd-DataStart+1))
-    CumT <- tail(head(in_data$T, DataEnd), (DataEnd-DataStart+1))
-    TI <- tail(head(in_data$TI, DataEnd), (DataEnd-DataStart+1))
+    DataIntervalStart <- DataRange[1]
+    DataIntervalEnd <- DataRange[2]
     
-    FC_to_IF_inData <- FCFrame_to_IFFrame(in_data$T, in_data$FC)
-      
-    FN <- c(unlist(subset(subset(FC_to_IF_inData, FC_to_IF_inData$FC_TI >= DataIntervalStart_FDT, select = c(FC_FN, FC_TI, FC_IF, FC_FT)), FC_TI <= DataIntervalEnd_FDT, select = FC_FN)), use.names=FALSE)
-    FT <- c(unlist(subset(subset(FC_to_IF_inData, FC_to_IF_inData$FC_TI >= DataIntervalStart_FDT, select = c(FC_FN, FC_TI, FC_IF, FC_FT)), FC_TI <= DataIntervalEnd_FDT, select = FC_FT)), use.names=FALSE)
-    IF <- c(unlist(subset(subset(FC_to_IF_inData, FC_to_IF_inData$FC_TI >= DataIntervalStart_FDT, select = c(FC_FN, FC_TI, FC_IF, FC_FT)), FC_TI <= DataIntervalEnd_FDT, select = FC_IF)), use.names=FALSE)
-    IntervalNum <- c(unlist(subset(subset(FC_to_IF_inData, FC_to_IF_inData$FC_TI >= DataIntervalStart_FDT, select = c(FC_FN, FC_TI, FC_IF, FC_FT)), FC_TI <= DataIntervalEnd_FDT, select = FC_TI)), use.names=FALSE)
+    in_data <- in_data$FRate
+    
+    DataColNames <- names(in_data)
+    names(in_data) <- gsub("x.", "", DataColNames)
+
+    IF <- tail(head(in_data$IF, DataIntervalEnd), (DataIntervalEnd-DataIntervalStart+1))
+    FT <- tail(head(in_data$FT, DataIntervalEnd), (DataIntervalEnd-DataIntervalStart+1))
+    FN <- tail(head(in_data$FN, DataIntervalEnd), (DataIntervalEnd-DataIntervalStart+1))
     
     if (DataOrTrend == 1) {
-      
-      # Create a table of the failure data
-      
-      D_or_T_table <- data.frame("Test Interval"=TI, "Cumulative Test Time"=CumT, "Failure Counts"=FC, "Cumulative Failure Count"=CFC)
-      
+      # Create failure data table
+
+      D_or_T_table <- data.frame("Failure Number"=FN, "Times Between Failures"=IF, "Failure Time"=FT)
     } else if (DataOrTrend == 2) {
-      
-      # Create a table of the trend test
+      # Create trend test table
       
       if (TrendTest == "LP") {
         
@@ -92,7 +112,6 @@ data_or_trend_table <- function(inputData, DataRange, DataOrTrend, TrendTest) {
         
         trendStat <- running_average_test(IF)
         D_or_T_table <- data.frame("Failure Number"=FN, "Times Between Failures"=IF, "Running Average IF Time"=trendStat$Running_Average)
-        
       } else {
         
         # Couldn't determine trend test type.
@@ -101,7 +120,6 @@ data_or_trend_table <- function(inputData, DataRange, DataOrTrend, TrendTest) {
         TableCreateError <- TRUE
       }
     } else {
-      
       # Couldn't determine whether to create a data or
       # trend test table.
       # #print an error message.
@@ -114,9 +132,8 @@ data_or_trend_table <- function(inputData, DataRange, DataOrTrend, TrendTest) {
     # #print an error message.
     
     TableCreateError <- TRUE
-  }
+  } # Endif - working with failure counts or failure times?
 
-    
   if (TableCreateError) {
     
     # If we've encountered any errors in creating the table,
