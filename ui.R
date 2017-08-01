@@ -561,9 +561,15 @@ shinyUI(navbarPage("Software Reliability Assessment in R",
                               
                               mainPanel(
                                 tabsetPanel(
-                                  tabPanel('Table',DT::dataTableOutput('mytable2'))
-                                  #tabPanel("Plot",plotOutput("Evalationplot"))
-                                )                              
+                                  #tabPanel("Plot",plotOutput("Evalutionplot"))
+                                  tabPanel("Evaluation Summary",DT::dataTableOutput('mytable2')),
+                                  tabPanel("Model Evaluation Plot", 
+                                           plotOutput("ModelEvaluationPlot", dblclick="MPdblclick2", brush=brushOpts(id="MP_brush2", resetOnNew=TRUE))
+                                  ),
+                                  tabPanel("Model Evaluation Table",
+                                           DT::dataTableOutput('mytable3')
+                                  )
+                                ), width = 8                              
                               )
                             )
                    )

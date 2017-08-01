@@ -72,6 +72,10 @@ GO_BM_FT_MLE <- function(x){
     sol
 }
 
+GO_Preq_lnL <- function(){
+  # Prequential likelihood function
+  
+}
 
 GO_FT_lnL <- function(params,paramNames,negLnL,failData){
   names(params)<-paramNames

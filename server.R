@@ -184,6 +184,9 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         
         # Here we compute prequential likelihood and model bias for the models.
         
+        tempEvalsList <- run_model_evals(ModeledData, ModelResults, input$modelDataRange, SuccessfulModels, input)
+        ModelEvalsList <<- tempEvalsList
+        
         # Update the model results selection pull-downs with the names of the
         # models that have been successfully run.
         

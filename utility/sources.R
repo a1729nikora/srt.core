@@ -53,4 +53,5 @@ debugSource("utility/tables/ModelResultTable.R")
 
 # Other utilities
 debugSource("utility/RunModels.R")      # Models run flow
+debugSource("utility/RunModelEvals.R") # Models applicability evaluations flow
 source("utility/ErrorMessages.R")
