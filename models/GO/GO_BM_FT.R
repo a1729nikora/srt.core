@@ -72,7 +72,7 @@ GO_BM_FT_MLE <- function(x){
     sol
 }
 
-GO_Preq_lnL <- function(){
+GO_FT_Preq_lnL <- function(){
   # Prequential likelihood function
   
 }

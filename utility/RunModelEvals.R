@@ -29,21 +29,28 @@ run_model_evals <- function(modeled_data, model_results, model_data_range, succe
       model_ID <- successful_models$MLE[i]
       
       parm_names <- get(paste(successful_models$MLE[i], "params", sep="_"))
-      parm_estimates <- matrix(nrow=DataEnd-ParmInitIntvl+1, ncol=length(parm_names))
+      parm_estimates <- matrix(nrow=DataEnd-ParmInitIntvl, ncol=length(parm_names))
       parm_estimates <- as.data.frame(parm_estimates)
       names(parm_estimates) <- parm_names
       
       for (k in 1:length(parm_names)) {
         col_name <- paste(model_ID, parm_names[k], "MLE", sep="_")
-        parm_estimates[[parm_names[k]]] <- head(tail(as.array(unlist(model_results[[col_name]])), DataEnd-ParmInitIntvl+2), DataEnd-ParmInitIntvl+1)
+        parm_estimates[[parm_names[k]]] <- head(tail(as.array(unlist(model_results[[col_name]])), DataEnd-ParmInitIntvl+2), DataEnd-ParmInitIntvl)
       }
 
       # Compute prequential likelihood
 
-      preqLike <- paste(successful_models$MLE[i], "Preq", "lnL", sep="_")
-      print(model_ID)         # Debug code
+      preqLike <- paste(successful_models$MLE[i], "FT", "Preq", "lnL", sep="_")
+      print(preqLike)         # Debug code
       print(parm_estimates)   # Debug code
-      #lnPl <- get(preqLike)
+      FN <- modeled_data$FRate$FN
+      IF <- c(unlist(subset(subset(modeled_data$FRate, modeled_data$FRate$FN >= ParmInitIntvl, select = c(FN, IF, FT)), FN <= DataEnd, select = IF)), use.names=FALSE)
+      FT <- c(unlist(subset(subset(modeled_data$FRate, modeled_data$FRate$FN >= ParmInitIntvl, select = c(FN, IF, FT)), FN <= DataEnd, select = FT)), use.names=FALSE)
+      FN <- c(unlist(subset(subset(modeled_data$FRate, modeled_data$FRate$FN >= ParmInitIntvl, select = c(FN, IF, FT)), FN <= DataEnd, select = FN)), use.names=FALSE)
+      in_fail_data <- data.frame("FT"=FT, "IF"=IF, "FN"=FN)
+      print(in_fail_data)   # Debug code
+      
+      #lnPl <- get(preqLike(parm_estimates, in_fail_data))
       
       # Compute prequential likelihood ratio
       
