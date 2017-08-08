@@ -50,7 +50,7 @@ run_model_evals <- function(modeled_data, model_results, model_data_range, succe
       in_fail_data <- data.frame("FT"=FT, "IF"=IF, "FN"=FN)
       print(in_fail_data)   # Debug code
       
-      #lnPl <- get(preqLike(parm_estimates, in_fail_data))
+      lnPl <- get(preqLike)(parm_estimates, in_fail_data)
       
       # Compute prequential likelihood ratio
       

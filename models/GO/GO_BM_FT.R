@@ -72,9 +72,17 @@ GO_BM_FT_MLE <- function(x){
     sol
 }
 
-GO_FT_Preq_lnL <- function(){
+GO_FT_Preq_lnL <- function(parm_frame, fail_data){
   # Prequential likelihood function
+  # Returns -ln(prequential likelihood)
   
+  cumT <- head(fail_data$FT, length(fail_data$FT)-1)
+  cumT_1 <- tail(fail_data$FT, length(fail_data$FT)-1)
+  ln_PL <- c(rep(NA, length(fail_data$FT)-1))
+  ln_PL <- -log(parm_frame$aMLE) + log(parm_frame$bMLE) - parm_frame$aMLE*(exp(-parm_frame$bMLE*cumT) - exp(-parm_frame$bMLE*cumT_1)) - parm_frame$bMLE*cumT
+  ln_PL <- -cumsum(ln_PL)
+  print(ln_PL)  # Debug code
+  return(ln_PL)
 }
 
 GO_FT_lnL <- function(params,paramNames,negLnL,failData){
