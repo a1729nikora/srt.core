@@ -13,14 +13,15 @@ run_model_evals <- function(modeled_data, model_results, model_data_range, succe
   
   # Set up the data frame in which the results will be returned.
 
-  localEvalsFrame <- matrix(data=NA, nrow=(DataEnd-ParmInitIntvl), ncol=(length(ModelEvalTypes)*length(successful_models$MLE)))
-  evalNames <- c()
+  localEvalsFrame <- matrix(data=NA, nrow=(DataEnd-ParmInitIntvl), ncol=1+(length(ModelEvalTypes)*length(successful_models$MLE)))
+  evalNames <- c("Failure Number")
+  localEvalsFrame[,1] <- c(localEstIntvlEnd:(DataEnd-1))
   for (k in 1:length(ModelEvalTypes)) {
     evalNames <- c(evalNames, paste(c(successful_models$MLE), ModelEvalTypes[k], sep="_"))
   }
   localEvalsFrame <- as.data.frame(localEvalsFrame)
   names(localEvalsFrame) <- evalNames
-  
+
   #print(successful_models$MLE)  # Debug code
   
   if (("FRate" %in% (names(modeled_data))) && !("FCount" %in% (names(modeled_data)))) {

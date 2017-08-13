@@ -42,6 +42,7 @@ source("trend_tests/Laplace_trend_test.R")
 source("utility/plots/Plot_Raw_Data.R")
 source("utility/plots/Plot_Trend_Tests.R")
 debugSource("utility/plots/PlotModelResults.R")
+source("utility/plots/PlotModelEvals.R")
 source("utility/plots/PlotModelPredictionResults.R")
 
 # Data utility functions

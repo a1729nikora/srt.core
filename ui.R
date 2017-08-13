@@ -563,10 +563,26 @@ shinyUI(navbarPage("Software Reliability Assessment in R",
                                 tabsetPanel(
                                   #tabPanel("Plot",plotOutput("Evalutionplot"))
                                   tabPanel("Evaluation Summary",DT::dataTableOutput('mytable2')),
-                                  tabPanel("Model Evaluation Plot", 
-                                           plotOutput("ModelEvaluationPlot", dblclick="MPdblclick2", brush=brushOpts(id="MP_brush2", resetOnNew=TRUE))
+                                  tabPanel("Model Evaluation Plot",
+                                           fluidRow (
+                                             column(12,
+                                               selectInput(
+                                                 "EvalToPlot", label = h6("Choose a model applicability evaluation to plot."), 
+                                                 choices=list("No model evaluations to plot"="None"),
+                                                 multiple=FALSE, selected="None") 
+                                             )
+                                           ),
+                                           plotOutput("ModelEvaluationPlot", dblclick="MEPdblclick", brush=brushOpts(id="MEP_brush", resetOnNew=TRUE))
                                   ),
                                   tabPanel("Model Evaluation Table",
+                                           fluidRow (
+                                             column(12,
+                                                    selectInput(
+                                                      "EvalForTable", label = h6("Choose a model applicability evaluation to display."), 
+                                                      choices=list("No model evaluations to display"="None"),
+                                                      multiple=FALSE, selected="None")
+                                             )
+                                           ),
                                            DT::dataTableOutput('mytable3')
                                   )
                                 ), width = 8                              

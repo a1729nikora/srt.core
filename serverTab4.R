@@ -1,10 +1,10 @@
 ###############################################################################
-#Tab4 Table Section
+#Tab4 Summary Table Section
 ###############################################################################
 
-# ------------------------------------------------------------------------------------------------------
+  # --------------------------------------------------------------------------------------------------------
   # ------------------------------------------------------------------------------------------------------
-  # ----------------------------------------   TAB4 Table   ----------------------------------------------
+  # ------------------------------------   TAB4 Summary Table   ------------------------------------------
   # ------------------------------------------------------------------------------------------------------
   # ------------------------------------------------------------------------------------------------------
 
@@ -165,3 +165,66 @@
 ###############################################################################
 #Tab4 Plot Section
 ###############################################################################
+
+  # A reactive data item that is used to control the height of the model evals
+  # plot.  The height is computed based on the width - it the plot is not as high
+  # as it is wide, and if the width exceeds a minimum, then the height catches up with
+  # the width to make a square plot.
+  
+  MP_height <- reactive({
+    Width <- session$clientData$output_ModelPlot_width
+    Height <- session$clientData$output_ModelPlot_height
+    if((Width > Height) && (Width > 400)) {
+      Height <- Width*0.75
+    }
+    Height
+  })
+  
+  # Read the position of the mouse for the model results plot
+  
+  MPranges <- reactiveValues(x = NULL, y = NULL)
+  
+  # Event observer for double-click on model results plot.
+  # Double click and brush zooms in and out.
+  
+  observeEvent(input$MEPdblclick, {
+    MPbrush <- input$MEP_brush
+    if (!is.null(MPbrush)) {
+      MPranges$x <- c(MPbrush$xmin, MPbrush$xmax)
+      MPranges$y <- c(MPbrush$ymin, MPbrush$ymax)
+      
+    } else {
+      MPranges$x <- NULL
+      MPranges$y <- NULL
+    }
+  })
+  
+  
+# ------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
+# ------------------------------------   TAB4 Evaluations Plot   ---------------------------------------
+# ------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
+  
+  output$ModelEvaluationPlot <- renderPlot({
+    MEPlot <<-NULL
+    if((length(input$modelResultsForEval) > 0) && (input$modelResultsForEval[1] != "None") && (!is.null(ModelEvalsFrame))) {
+      MEPlot <<- plot_model_evals(ModelEvalsFrame, input$modelResultsForEval, ModeledDataName, input)
+      if(!is.null(MRPlot)) {
+        MEPlot <<- MEPlot + coord_cartesian(xlim = MPranges$x, ylim = MPranges$y)
+      }
+    }
+    MEPlot
+  }, height=MP_height)
+  
+
+###############################################################################
+#Tab4 Evaluation Detail Table Section
+###############################################################################
+  
+# ------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
+# --------------------------------   TAB4 Evaluations Detail Table   -----------------------------------
+# ------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
+  
