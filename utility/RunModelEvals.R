@@ -3,13 +3,23 @@ library(numDeriv)
 
 
 run_model_evals <- function(modeled_data, model_results, model_data_range, successful_models, input) {
-  evalsList <- c()
   
+  ModelEvalTypes <- c("-lnPL", "PL Ratio", "Bias", "Bias Trend")
   ParmInitIntvl <- input$parmEstIntvl
   DataStart <- model_data_range[1]
   DataEnd <- model_data_range[2]
   OffsetFailure <- DataStart-1
   localEstIntvlEnd <- ParmInitIntvl-DataStart+1
+  
+  # Set up the data frame in which the results will be returned.
+
+  localEvalsFrame <- matrix(data=NA, nrow=(DataEnd-ParmInitIntvl), ncol=(length(ModelEvalTypes)*length(successful_models$MLE)))
+  evalNames <- c()
+  for (k in 1:length(ModelEvalTypes)) {
+    evalNames <- c(evalNames, paste(c(successful_models$MLE), ModelEvalTypes[k], sep="_"))
+  }
+  localEvalsFrame <- as.data.frame(localEvalsFrame)
+  names(localEvalsFrame) <- evalNames
   
   #print(successful_models$MLE)  # Debug code
   
@@ -38,28 +48,48 @@ run_model_evals <- function(modeled_data, model_results, model_data_range, succe
         parm_estimates[[parm_names[k]]] <- head(tail(as.array(unlist(model_results[[col_name]])), DataEnd-ParmInitIntvl+2), DataEnd-ParmInitIntvl)
       }
 
-      # Compute prequential likelihood
+      # Set up parameters to compute model evaluation criteria
 
       preqLike <- paste(successful_models$MLE[i], "FT", "Preq", "lnL", sep="_")
+      modelBias <- paste(successful_models$MLE[i], "FT", "Bias", sep="_")
+      modelTrend <- paste(successful_models$MLE[i], "FT", "Bias", "Trend", sep="_")
       print(preqLike)         # Debug code
       print(parm_estimates)   # Debug code
+      
       FN <- modeled_data$FRate$FN
       IF <- c(unlist(subset(subset(modeled_data$FRate, modeled_data$FRate$FN >= ParmInitIntvl, select = c(FN, IF, FT)), FN <= DataEnd, select = IF)), use.names=FALSE)
       FT <- c(unlist(subset(subset(modeled_data$FRate, modeled_data$FRate$FN >= ParmInitIntvl, select = c(FN, IF, FT)), FN <= DataEnd, select = FT)), use.names=FALSE)
       FN <- c(unlist(subset(subset(modeled_data$FRate, modeled_data$FRate$FN >= ParmInitIntvl, select = c(FN, IF, FT)), FN <= DataEnd, select = FN)), use.names=FALSE)
       in_fail_data <- data.frame("FT"=FT, "IF"=IF, "FN"=FN)
-      print(in_fail_data)   # Debug code
+      #print(in_fail_data)   # Debug code
       
-      lnPl <- get(preqLike)(parm_estimates, in_fail_data)
+      # Compute prequential likelihood
       
-      # Compute prequential likelihood ratio
+      k <- 1
+      tempEval <- get(preqLike)(parm_estimates, in_fail_data)
+      localEvalsFrame[[paste(successful_models$MLE[i], ModelEvalTypes[k], sep="_")]] <- tempEval
       
-      # Copmute model bias
+      # Compute model bias
+      
+      k <- 3
+      tempEval <- get(modelBias)(parm_estimates, in_fail_data)
+      localEvalsFrame[[paste(successful_models$MLE[i], ModelEvalTypes[k], sep="_")]] <- tempEval
       
       # Compute model bias trend
+      
+      k <- 4
+      tempEval <- get(modelTrend)(parm_estimates, in_fail_data)
+      localEvalsFrame[[paste(successful_models$MLE[i], ModelEvalTypes[k], sep="_")]] <- tempEval
     }
+    for (i in 1:length(successful_models$MLE)) {
+      
+      # Compute prequential likelihood ratio
+      k <- 2
+      
+    }
+    #print(localEvalsFrame)  # Debug code
   } else {
     # We're dealing with Failure Counts data
   }
-  return(evalsList)
+  return(localEvalsFrame)
 }
