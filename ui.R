@@ -466,6 +466,12 @@ shinyUI(navbarPage("Software Reliability Assessment in R",
                                                                  value = .90)
                                              ),
                                              
+                                            column(12, 
+                                                    radioButtons("ModelEvalPlotType", label = h6("Draw the plot with data points and lines, points only, or lines only?"),
+                                                                 choices = list("Both" = "points_and_lines", "Points" = "points", "Lines" = "lines"), inline = TRUE,
+                                                                 selected = "points_and_lines")
+                                             ),
+
                                              column(12, 
                                                     radioButtons("saveModelEvalType", label = h6("Save model evaluations as PDF or CSV?"),
                                                                  choices = list("CSV" = "CSV", "PDF" = "PDF"), inline = TRUE,

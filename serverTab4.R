@@ -207,10 +207,11 @@
 # ------------------------------------------------------------------------------------------------------
   
   output$ModelEvaluationPlot <- renderPlot({
+    data_set <- input$dataSheetChoice
     MEPlot <<-NULL
     if((length(input$modelResultsForEval) > 0) && (input$modelResultsForEval[1] != "None") && (!is.null(ModelEvalsFrame))) {
-      MEPlot <<- plot_model_evals(ModelEvalsFrame, input$modelResultsForEval, ModeledDataName, input)
-      if(!is.null(MRPlot)) {
+      MEPlot <<- plot_model_evals(ModelEvalsFrame, data_set, input, MPranges$x, MPranges$y, session$clientData$output_ModelPlot_width)
+      if(!is.null(MEPlot)) {
         MEPlot <<- MEPlot + coord_cartesian(xlim = MPranges$x, ylim = MPranges$y)
       }
     }

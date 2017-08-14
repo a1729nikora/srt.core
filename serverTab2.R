@@ -5,7 +5,7 @@
 ###############################################################################
 
 
-  # ------------------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------------------
   # ------------------------------------------------------------------------------------------------------
   # --------------------------- Display selected model results in tabular form  --------------------------
   # ------------------------------------------------------------------------------------------------------
@@ -162,7 +162,7 @@
       }
     )
 
-  # ------------------------------------------------------------------------------------------------------
+      # ------------------------------------------------------------------------------------------------------
   # ------------------------------------------------------------------------------------------------------
   # ----------------------------------------   Model Plot   ----------------------------------------------
   # ------------------------------------------------------------------------------------------------------
@@ -170,11 +170,12 @@
 
 
     output$ModelPlot <- renderPlot({
+      data_set <- input$dataSheetChoice
       MRPlot <<- NULL
       if((length(input$modelResultChoice) > 0) && (input$modelResultChoice[1] != "None") && (!is.null(ModelResults)) && (!is.null(ModeledData))) {
         #MRPlot <- plot_model_results(ModelResults, ModeledData, ModeledDataName, input$modelResultChoice, input$modelPlotChoice, input$ModelDataPlotType, input$checkboxDataOnPlot, input$checkboxDataEndOnPlot, input$modelRelMissionTime, MPranges$x, MPranges$y, session$clientData$output_ModelPlot_width, input$modelCurveAdditionalTime)
         
-        MRPlot <<- plot_model_results(ModelResults, SuccessfulModels, ModeledData, ModeledDataName, input, MPranges$x, MPranges$y, session$clientData$output_ModelPlot_width)
+        MRPlot <<- plot_model_results(ModelResults, SuccessfulModels, ModeledData, data_set, input, MPranges$x, MPranges$y, session$clientData$output_ModelPlot_width)
         if(!is.null(MRPlot)) {
           MRPlot <<- MRPlot + coord_cartesian(xlim = MPranges$x, ylim = MPranges$y)
         }
