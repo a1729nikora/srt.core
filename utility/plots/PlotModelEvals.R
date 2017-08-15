@@ -103,10 +103,10 @@ plot_model_evals <- function(ModelEvalsData, DataSetName, input, plotWidthRange,
           model_plot_data <- data.frame("Time" = ModelEvalsData[["Failure Number"]], "Failure" = ModelEvalsData[[paste(modelIndex, "PL Ratio", sep="_")]], "Model" = rep(get(paste(modelIndex, "fullname", sep="_")), length(ModelEvalsData[["Failure Number"]])))
           model_line_data <- model_plot_data
         } else if (DataView == "UPlot") {
-          model_plot_data <- data.frame("Time" = ModelEvalsData[["Bias"]], "Failure" = sort(ModelEvalsData[[paste(modelIndex, "Bias", sep="_")]])*cumsum(1/(rep(length(ModelEvalsData[["Failure Number"]])))), "Model" = rep(get(paste(modelIndex, "fullname", sep="_")), length(ModelEvalsData[["Failure Number"]])))
+          model_plot_data <- data.frame("Time" = sort(ModelEvalsData[[paste(modelIndex, "Bias", sep="_")]]), "Failure" = cumsum(rep(1/length(ModelEvalsData[["Failure Number"]]), length(ModelEvalsData[["Failure Number"]]))), "Model" = rep(get(paste(modelIndex, "fullname", sep="_")), length(ModelEvalsData[["Failure Number"]])))
           model_line_data <- model_plot_data
         } else if (DataView == "YPlot") {
-          model_plot_data <- data.frame("Time" = ModelEvalsData[["Bias Trend"]], "Failure" = ModelEvalsData[[paste(modelIndex, "Bias Trend", sep="_")]]*cumsum(1/(rep(length(ModelEvalsData[["Failure Number"]])))), "Model" = rep(get(paste(modelIndex, "fullname", sep="_")), length(ModelEvalsData[["Failure Number"]])))
+          model_plot_data <- data.frame("Time" = ModelEvalsData[[paste(modelIndex, "Bias Trend", sep="_")]], "Failure" = cumsum(rep(1/length(ModelEvalsData[["Failure Number"]]), length(ModelEvalsData[["Failure Number"]]))), "Model" = rep(get(paste(modelIndex, "fullname", sep="_")), length(ModelEvalsData[["Failure Number"]])))
           model_line_data <- model_plot_data
         } else {
           
