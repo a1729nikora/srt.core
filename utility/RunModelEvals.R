@@ -32,6 +32,12 @@ run_model_evals <- function(modeled_data, model_results, model_data_range, succe
     # Only the MLE estimates of model parameters are used to compute these
     # applicability assessments.
     
+    # Set up a vector of minimum ln(prequential likelihood) values.
+    # That will be used to compute the prequential likelihood ratio
+    # from ln(prequential likelihood).
+    
+    tempPLmin <- rep(Inf, (DataEnd-ParmInitIntvl))
+    
     for (i in 1:length(successful_models$MLE)) {
       # First get the estimated parameters for the model from the model results table.
       # The names of parameters in this data frame are given by:
@@ -69,6 +75,7 @@ run_model_evals <- function(modeled_data, model_results, model_data_range, succe
       k <- 1
       tempEval <- get(preqLike)(parm_estimates, in_fail_data)
       localEvalsFrame[[paste(successful_models$MLE[i], ModelEvalTypes[k], sep="_")]] <- tempEval
+      tempPLmin <- pmin(tempEval, tempPLmin)
       
       # Compute model bias
       
@@ -86,7 +93,7 @@ run_model_evals <- function(modeled_data, model_results, model_data_range, succe
       
       # Compute prequential likelihood ratio
       k <- 2
-      
+      localEvalsFrame[[paste(successful_models$MLE[i], ModelEvalTypes[k], sep="_")]] <- exp(localEvalsFrame[[paste(successful_models$MLE[i], ModelEvalTypes[1], sep="_")]] - tempPLmin)
     }
     #print(localEvalsFrame)  # Debug code
   } else {
