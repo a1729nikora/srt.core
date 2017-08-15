@@ -107,7 +107,7 @@ GO_FT_Bias_Trend <- function(parm_frame, fail_data){
   trend <- GO_FT_Bias(parm_frame, fail_data)
   trend <- -log(1.0 - trend)
   sumtrend <- sum(trend)
-  trend <- trend/sumtrend
+  trend <- cumsum(trend)/sumtrend
   return(trend)
 }
 
