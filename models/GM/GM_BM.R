@@ -175,8 +175,8 @@ GM_FT_Preq_lnL <- function(parm_frame, fail_data){
   FailureNum <- head(fail_data$FN, length(fail_data$FN)-1)
   
   ln_PL <- c(rep(NA, length(fail_data$FT)-1))
-  ln_PL <- -parm_frame$D0 + (FailureNum*log(parm_frame$Phi)) - (parm_frame$D0*(parm_frame$Phi^FailureNum)*IF_1)
-  ln_PL <- -cumsum(ln_PL)
+  ln_PL <- -(log(parm_frame$D0) + (FailureNum*log(parm_frame$Phi)) - (parm_frame$D0*(parm_frame$Phi^FailureNum)*IF_1))
+  ln_PL <- cumsum(ln_PL)
   print(ln_PL)  # Debug code
   return(ln_PL)
 }
