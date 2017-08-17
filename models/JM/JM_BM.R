@@ -329,6 +329,53 @@ JM_MVF_r <- function(param,d){
   r
 }
 
+
+JM_FT_Preq_lnL <- function(parm_frame, fail_data){
+  # Prequential likelihood function
+  # Returns vector of -ln(prequential likelihood)
+  
+  IF <- head(fail_data$IF, length(fail_data$IF)-1)
+  IF_1 <- tail(fail_data$IF, length(fail_data$IF)-1)
+  FailureNum <- head(fail_data$FN, length(fail_data$FN)-1)
+  
+  ln_PL <- c(rep(NA, length(fail_data$FT)-1))
+  ln_PL <- (-log(parm_frame$Phi) * log(parm_frame$N0 - FailureNum)) - parm_frame$Phi*(parm_frame$N0 - FailureNum)*IF_1
+  ln_PL <- cumsum(ln_PL)
+  print(ln_PL)  # Debug code
+  print(IF)     # Debug code
+  print(FailureNum)     # Debug code
+  return(ln_PL)
+}
+
+
+
+JM_FT_Bias <- function(parm_frame, fail_data){
+  # Model bias function
+  # Returns unsorted vector of u(i)
+  
+  IF <- head(fail_data$IF, length(fail_data$IF)-1)
+  IF_1 <- tail(fail_data$IF, length(fail_data$IF)-1)
+  FailureNum <- head(fail_data$FN, length(fail_data$FN)-1)
+  
+  bias <- c(rep(NA, length(fail_data$FT)-1))
+  bias <- 1.0 - (exp(-parm_frame$Phi*(parm_frame$N0 - FailureNum)*IF_1))
+  print(bias)   # Debug code
+  return(bias)
+}
+
+
+JM_FT_Bias_Trend <- function(parm_frame, fail_data){
+  # Model bias trend function
+  # Returns vector of y(i)
+  
+  trend <- JM_FT_Bias(parm_frame, fail_data)
+  trend <- -log(1.0 - trend)
+  sumtrend <- sum(trend)
+  trend <- cumsum(trend)/sumtrend
+  return(trend)
+}
+
+
 JM_FT_lnL <- function(params,paramNames,negLnL,failData){
   #----------------------------------------------------------------------------
   # This computes Log-Likelihood for a given data x and parameters
