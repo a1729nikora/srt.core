@@ -137,6 +137,13 @@ plot_model_evals <- function(ModelEvalsData, DataSetName, input, plotWidthRange,
 
   } # End for - draw results for all models
   
+  if ((DataView == "UPlot") || (DataView == "YPlot")) {
+    # Draw a straight line from the origin to (1,1)
+    # if this is a u-plot or a y-plot.
+    
+    tempPlotData <- data.frame("Time"=cumsum(rep(1/length(ModelEvalsData[["Failure Number"]]), length(ModelEvalsData[["Failure Number"]]))), "Failure"=cumsum(rep(1/length(ModelEvalsData[["Failure Number"]]), length(ModelEvalsData[["Failure Number"]]))), "Model" =rep("Ideal", length(ModelEvalsData[["Failure Number"]])))
+    localEvalsPlot <- localEvalsPlot + geom_line(data=tempPlotData, aes(Time,Failure,color=Model,linetype=Model))
+  }
   
   #localEvalsPlot <- localEvalsPlot + scale_color_manual("", breaks=scaleManBreaks, values=scaleManColors)
   localEvalsPlot <- localEvalsPlot + theme(legend.position = "bottom", text = element_text(size=14))
