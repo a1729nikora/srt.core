@@ -172,8 +172,8 @@
   # the width to make a square plot.
   
   MP_height <- reactive({
-    Width <- session$clientData$output_ModelPlot_width
-    Height <- session$clientData$output_ModelPlot_height
+    Width <- session$clientData$output_ModelEvaluationPlot_width
+    Height <- session$clientData$output_ModelEvaluationPlot_height
     if((Width > Height) && (Width > 400)) {
       Height <- Width*0.75
     }
