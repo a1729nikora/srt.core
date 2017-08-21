@@ -137,6 +137,40 @@ Wei_AEM_FT_MLE <- function(tVec){
 }
 
 
+Wei_FT_Preq_lnL <- function(parm_frame, fail_data){
+  # Prequential likelihood function
+  # Returns vector of -ln(prequential likelihood)
+  
+  cumT <- head(fail_data$FT, length(fail_data$FT)-1)
+  cumT_1 <- tail(fail_data$FT, length(fail_data$FT)-1)
+  
+  ln_PL <- c(rep(NA, length(fail_data$FT)-1))
+  return(ln_PL)
+}
+
+
+
+Wei_FT_Bias <- function(parm_frame, fail_data){
+  # Model bias function
+  # Returns unsorted vector of u(i)
+  
+  cumT <- head(fail_data$FT, length(fail_data$FT)-1)
+  cumT_1 <- tail(fail_data$FT, length(fail_data$FT)-1)
+  
+  bias <- c(rep(NA, length(fail_data$FT)-1))
+  return(bias)
+}
+
+
+Wei_FT_Bias_Trend <- function(parm_frame, fail_data){
+  # Model bias trend function
+  # Returns vector of y(i)
+  
+  trend <- c(rep(NA, length(fail_data$FT)-1))
+  return(trend)
+}
+
+
 #print(-(1-exp(-(tn^cMLE)*bMLE))*aMLE+sum(log(exp(-bMLE*(tVec^cMLE))*bMLE*aMLE*cMLE*(tVec^(cMLE-1)))))
 
 #if(is.nan(ab[1])){
