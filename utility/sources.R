@@ -51,6 +51,8 @@ sys.source("utility/data/Data_Tools.R")
 # Tables utility functions
 source("utility/tables/DataAndTrendTables.R")
 debugSource("utility/tables/ModelResultTable.R")
+source("utility/tables/ModelEvalTable.R")
+
 
 # Other utilities
 debugSource("utility/RunModels.R")      # Models run flow

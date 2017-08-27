@@ -228,4 +228,31 @@
 # --------------------------------   TAB4 Evaluations Detail Table   -----------------------------------
 # ------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------
+
   
+  output$mytable3 <- DT::renderDataTable({
+    ModelEvalTypes <- c("-lnPL", "PL Ratio", "Bias", "Bias Trend")
+    
+    ME_Table <- NULL
+    
+    # Check if modelResultChoice is None and return NULL if true
+    if(length(input$modelResultsForEval)==0){
+      return(ME_Table)
+    }
+    if(input$modelResultsForEval[1]=="None"){
+      return(ME_Table)
+    }
+    if(is.null(ModelEvalsFrame)){
+      return
+    } else if(!is.null(ModelEvalsFrame)) {
+      if(length(input$modelResultsForEval) > 0) {
+        
+        # User has selected at least one set of model evaluations to display as a table.
+        
+        ME_Table <- model_eval_table(ModelEvalsFrame, input$modelResultsForEval, input)
+      }
+    }
+    ME_Table = round_table(ME_Table, 6)
+    ME_Table
+  }, filter="top", options = list(scrollX=TRUE, lengthMenu = list(c(10, 25, 50, -1), c('10', '25', '50', 'All'))))
+    
