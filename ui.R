@@ -3,7 +3,7 @@ library(shiny)
 #source("custom_functions.R")
 tags$head(includeScript("analytics/google-analytics.js"))
 tags$head()
-shinyUI(navbarPage("Software Reliability Assessment in R",
+shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                    tabPanel("Select, Analyze, and Filter Data",
                             
                             sidebarLayout(
@@ -472,8 +472,14 @@ shinyUI(navbarPage("Software Reliability Assessment in R",
                                                                  selected = "points_and_lines")
                                              ),
 
+                                            column(12, 
+                                                     radioButtons("saveModelEvalsType", label = h6("Choose the type of file to save plots.  The Model Evaluation Table is saved as a CSV file."),
+                                                                  choices = list("JPEG" = "JPG", "PDF" = "PDF", "PNG" = "PNG", "TIFF" = "TIFF"), inline = TRUE,
+                                                                  selected = "JPG")
+                                             ),
+  
                                              column(12, 
-                                                    radioButtons("saveModelEvalType", label = h6("Save model evaluations as PDF or CSV?"),
+                                                    radioButtons("saveModelEvalSummaryType", label = h6("Save the model evaluation summary as PDF or CSV?"),
                                                                  choices = list("CSV" = "CSV", "PDF" = "PDF"), inline = TRUE,
                                                                  selected = "CSV"),
                                                     downloadButton('saveModelEvals', 'Save Model Evaluations')
@@ -590,8 +596,8 @@ shinyUI(navbarPage("Software Reliability Assessment in R",
                                              )
                                            ),
                                            DT::dataTableOutput('mytable3')
-                                  )
-                                ), width = 8                              
+                                  ),
+                                  id="ModelEvaluationTabset"), width = 8                              
                               )
                             )
                    )

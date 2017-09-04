@@ -93,33 +93,69 @@
 
   output$saveModelEvals <- downloadHandler(
     filename = function() {
-      if(input$saveModelEvalType == "PDF") {
-        paste(paste0(ModeledDataName, "_Model_Evals"), "pdf", sep=".")
-      } else {
-        paste(paste0(ModeledDataName, "_Model_Evals"), "csv", sep=".")
+      data_set_name <- input$dataSheetChoice
+      if(input$ModelEvaluationTabset == "Model Evaluation Plot") {
+        
+        # Save model results plot.
+        
+        paste(paste0(data_set_name, "_Results_", input$EvalToPlot), input$saveModelEvalsType, sep=".")
+      } else if (input$ModelEvaluationTabset == "Model Evaluation Table") {
+        
+        # Save model results table.
+        
+        paste(paste0(data_set_name, "_Model_Evals"), "csv", sep=".")
+      } else if (input$ModelEvaluationTabset == "Evaluation Summary") {
+        
+        # Save model evaluation summary.
+        
+        if(input$saveModelEvalSummaryType == "PDF") {
+          paste(paste0(data_set_name, "_Eval_Summary"), "pdf", sep=".")
+        } else {
+          paste(paste0(data_set_name, "_Eval_Summary"), "csv", sep=".")
+        }
       }
     },
     content = function(filespec) {
-      tab4_table1_2_save <- tab4_table1
-      
-      # Turn OutputTable to character representations to avoid
-      # difficulties with NA, Inf, and NaN.
-      
-      TableNames <- names(tab4_table1_2_save)
-      for (nameIndex in TableNames) {
-        tab4_table1_2_save[[nameIndex]] <- as.character(tab4_table1_2_save[[nameIndex]])
-      }
-      names(tab4_table1_2_save) <- c("Model", "AIC", "PSSE")
-      
-      if(length(tab4_table1_2_save) <= 1) {
-        tab4_table1_2_save <- data.frame()
-      }
-      
-      if(input$saveModelEvalType == "PDF") {
-        out_put = knit2pdf('Tab4ReportTemplate.Rnw', clean = TRUE)
-        file.rename(out_put, filespec) # move pdf to file for downloading
-      } else {
-        utils::write.csv(tab4_table1_2_save, file=filespec, quote=TRUE, na="NA")
+      if(input$ModelEvaluationTabset == "Model Evaluation Plot") {
+        ggsave(filespec, plot=MEPlot, width=20,height=15)
+      } else if (input$ModelEvaluationTabset == "Evaluation Summary") {
+        tab4_table1_2_save <- tab4_table1
+        
+        # Turn OutputTable to character representations to avoid
+        # difficulties with NA, Inf, and NaN.
+        
+        TableNames <- names(tab4_table1_2_save)
+        for (nameIndex in TableNames) {
+          tab4_table1_2_save[[nameIndex]] <- as.character(tab4_table1_2_save[[nameIndex]])
+        }
+        names(tab4_table1_2_save) <- c("Model", "AIC", "PSSE")
+        
+        if(length(tab4_table1_2_save) <= 1) {
+          tab4_table1_2_save <- data.frame()
+        }
+        
+        if(input$saveModelEvalSummaryType == "PDF") {
+          out_put = knit2pdf('Tab4ReportTemplate.Rnw', clean = TRUE)
+          file.rename(out_put, filespec) # move pdf to file for downloading
+        } else {
+          utils::write.csv(tab4_table1_2_save, file=filespec, quote=TRUE, na="NA")
+        }
+      } else if (input$ModelEvaluationTabset == "Model Evaluation Table") {
+        OutputTable <- ModelEvalsFrame
+        
+        # Turn OutputTable to character representations to avoid
+        # difficulties with NA, Inf, and NaN.
+        
+        TableNames <- names(OutputTable)
+        for (nameIndex in TableNames) {
+          OutputTable[[nameIndex]] <- as.character(OutputTable[[nameIndex]])
+        }
+        
+        if(length(OutputTable) > 1) {
+        } else {
+          OutputTable <- data.frame()
+        }
+        utils::write.csv(OutputTable, file=filespec, quote=TRUE, na="NA")
       }
     }
   )
