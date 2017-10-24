@@ -129,6 +129,7 @@ DSS_FT_Preq_lnL <- function(parm_frame, fail_data){
   cumT_1 <- tail(fail_data$FT, length(fail_data$FT)-1)
   
   IF <- head(fail_data$IF, length(fail_data$IF)-1)
+  IF_1 <- tail(fail_data$IF, length(fail_data$IF)-1)
   FinalIFTime <- IF[length(IF)]
   log_IF <- log(IF)
   cum_log_IF <- cumsum(log_IF)
@@ -136,8 +137,8 @@ DSS_FT_Preq_lnL <- function(parm_frame, fail_data){
   n <- length(IF)
   
   ln_PL <- c(rep(NA, length(fail_data$FT)-1))
-  ln_PL <- -parm_frame$aMLE*(1-(1+parm_frame$bMLE*FinalIFTime)*exp(-parm_frame$bMLE*FinalIFTime))+n*log(parm_frame$aMLE)+2*n*log(parm_frame$bMLE) + cum_log_IF - parm_frame$bMLE*cumT
-  ln_PL <- 0.0 - (log(parm_frame$aMLE) + log(parm_frame$bMLE) - parm_frame$aMLE * (exp(-parm_frame$bMLE*cumT) -  exp(-parm_frame$bMLE*cumT_1)) - parm_frame$bMLE*cumT_1)
+  ln_PL <- log(parm_frame$aMLE) + 2*log(parm_frame$bMLE) + log(cumT) - (parm_frame$bMLE*(cumT))
+  ln_PL <- -(ln_PL - parm_frame$aMLE*((1+parm_frame$bMLE*cumT)*exp(-parm_frame$bMLE*cumT) - (1+parm_frame$bMLE*cumT_1)*exp(-parm_frame$bMLE*cumT_1)))
   ln_PL <- cumsum(ln_PL)
   print(ln_PL)  # Debug code
   return(ln_PL)
