@@ -145,6 +145,9 @@ Wei_FT_Preq_lnL <- function(parm_frame, fail_data){
   cumT_1 <- tail(fail_data$FT, length(fail_data$FT)-1)
   
   ln_PL <- c(rep(NA, length(fail_data$FT)-1))
+  ln_PL <- log(parm_frame$aMLE)+log(parm_frame$bMLE)+log(parm_frame$cMLE)-(parm_frame$bMLE*(cumT_1^parm_frame$cMLE))+((parm_frame$cMLE-1)*log(cumT_1))
+  ln_PL <- -(ln_PL + parm_frame$aMLE*(exp(-parm_frame$bMLE*(cumT_1^parm_frame$cMLE)) - exp(-parm_frame$bMLE*(cumT^parm_frame$cMLE))))
+  ln_PL <- cumsum(ln_PL)
   return(ln_PL)
 }
 
