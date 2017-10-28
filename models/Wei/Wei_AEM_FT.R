@@ -161,7 +161,7 @@ Wei_FT_Bias <- function(parm_frame, fail_data){
   cumT_1 <- tail(fail_data$FT, length(fail_data$FT)-1)
   
   bias <- c(rep(NA, length(fail_data$FT)-1))
-  bias <- 1.0 - (-parm_frame$aMLE*exp(-parm_frame$bMLE*(cumT_1^parm_frame$cMLE)))
+  bias <- 1.0 - (exp(-parm_frame$bMLE*(cumT_1^parm_frame$cMLE)))
   print(bias)
   return(bias)
 }
