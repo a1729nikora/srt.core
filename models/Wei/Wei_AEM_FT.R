@@ -161,6 +161,8 @@ Wei_FT_Bias <- function(parm_frame, fail_data){
   cumT_1 <- tail(fail_data$FT, length(fail_data$FT)-1)
   
   bias <- c(rep(NA, length(fail_data$FT)-1))
+  bias <- 1.0 - (-parm_frame$aMLE*exp(-parm_frame$bMLE*(cumT_1^parm_frame$cMLE)))
+  print(bias)
   return(bias)
 }
 
@@ -169,7 +171,10 @@ Wei_FT_Bias_Trend <- function(parm_frame, fail_data){
   # Model bias trend function
   # Returns vector of y(i)
   
-  trend <- c(rep(NA, length(fail_data$FT)-1))
+  trend <- Wei_FT_Bias(parm_frame, fail_data)
+  trend <- -log(1.0 - trend)
+  sumtrend <- sum(trend)
+  trend <- cumsum(trend)/sumtrend
   return(trend)
 }
 
