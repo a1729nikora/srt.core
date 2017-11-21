@@ -255,6 +255,16 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                                     checkboxInput("HighConfOnRsltPlot", label = "High", value = FALSE)
                                              )
                                            ),
+                                           fluidRow (
+                                             column(6,
+                                                    h6("Display recalibrated model results?")
+                                                    ),
+                                             column(6,
+                                                    radioButtons("dispRecalModelResults", label = NULL,
+                                                                 choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
+                                                                 selected = "N")
+                                             )
+                                           ),
                                            plotOutput("ModelPlot", dblclick="MPdblclick", brush=brushOpts(id="MP_brush", resetOnNew=TRUE))), 
                                   tabPanel("Model Result Table",
                                            fluidRow (
@@ -420,6 +430,16 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                              checkboxInput("HighConfOnQueryPlot", label = "High", value = FALSE)
                                       )
                                     ),
+                                    fluidRow (
+                                      column(6,
+                                             h6("Display recalibrated model predictions?")
+                                      ),
+                                      column(6,
+                                             radioButtons("dispRecalModelPreds", label = NULL,
+                                                          choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
+                                                          selected = "N")
+                                      )
+                                    ),
                                     plotOutput("ModelPredictionPlot", dblclick="MPdblclick1", brush=brushOpts(id="MP_brush1", resetOnNew=TRUE))
                                     ),
                                  # DT::dataTableOutput('mytable1')
@@ -582,6 +602,16 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                                  "EvalToPlot", label = h6("Choose a model applicability evaluation to plot."), 
                                                  choices=list("No model evaluations to plot"="None"),
                                                  multiple=FALSE, selected="None") 
+                                             )
+                                           ),
+                                           fluidRow (
+                                             column(6,
+                                                    h6("Display recalibrated model evaluations?")
+                                             ),
+                                             column(6,
+                                                    radioButtons("dispRecalModelEvals", label = NULL,
+                                                                 choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
+                                                                 selected = "N")
                                              )
                                            ),
                                            plotOutput("ModelEvaluationPlot", dblclick="MEPdblclick", brush=brushOpts(id="MEP_brush", resetOnNew=TRUE))
