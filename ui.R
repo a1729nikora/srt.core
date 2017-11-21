@@ -113,7 +113,7 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                    tabPanel("Set Up and Apply Models",
                             
                             sidebarLayout(
-                              sidebarPanel(h4("Configure and Apply Models"),
+                              sidebarPanel(h4("Set Up and Apply Models"),
                                            h5("Specify the number of failures for which the models will make predictions"),
                                            
                                            fluidRow(
@@ -260,7 +260,7 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                                     h6("Display recalibrated model results?")
                                                     ),
                                              column(6,
-                                                    radioButtons("dispRecalModelResults", label = NULL,
+                                                    radioButtons("dispRecalModelResultsPlot", label = NULL,
                                                                  choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
                                                                  selected = "N")
                                              )
@@ -287,6 +287,16 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                                column(2,
                                                       checkboxInput("HighConfOnTable", label = "High", value = FALSE)
                                                )
+                                             )
+                                           ),
+                                           fluidRow (
+                                             column(6,
+                                                    h6("Display recalibrated model results?")
+                                             ),
+                                             column(6,
+                                                    radioButtons("dispRecalModelResultsTable", label = NULL,
+                                                                 choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
+                                                                 selected = "N")
                                              )
                                            ),
                                            DT::dataTableOutput("ModelResultTable")),
@@ -411,7 +421,17 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                                     checkboxInput("HighConfOnQueryTbl", label = "High", value = FALSE)
                                              )
                                            ),
-                                    DT::dataTableOutput('mytable1')
+                                           fluidRow (
+                                             column(6,
+                                                    h6("Display recalibrated model predictions?")
+                                             ),
+                                             column(6,
+                                                    radioButtons("dispRecalModelPredsTable", label = NULL,
+                                                                 choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
+                                                                 selected = "N")
+                                             )
+                                           ),
+                                           DT::dataTableOutput('mytable1')
                                     ),
                                   tabPanel("Model Prediction Result Plot", 
                                     # textOutput("ModelConfigError"), 
@@ -435,7 +455,7 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                              h6("Display recalibrated model predictions?")
                                       ),
                                       column(6,
-                                             radioButtons("dispRecalModelPreds", label = NULL,
+                                             radioButtons("dispRecalModelPredsPlot", label = NULL,
                                                           choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
                                                           selected = "N")
                                       )
@@ -594,7 +614,19 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                               mainPanel(
                                 tabsetPanel(
                                   #tabPanel("Plot",plotOutput("Evalutionplot"))
-                                  tabPanel("Evaluation Summary",DT::dataTableOutput('mytable2')),
+                                  tabPanel("Model Evaluation Summary",
+                                           fluidRow (
+                                             column(6,
+                                                    h6("Display recalibrated model evaluations?")
+                                             ),
+                                             column(6,
+                                                    radioButtons("dispRecalModelEvalsSummary", label = NULL,
+                                                                 choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
+                                                                 selected = "N")
+                                             )
+                                           ),
+                                           DT::dataTableOutput('mytable2')
+                                  ),
                                   tabPanel("Model Evaluation Plot",
                                            fluidRow (
                                              column(12,
@@ -609,7 +641,7 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                                     h6("Display recalibrated model evaluations?")
                                              ),
                                              column(6,
-                                                    radioButtons("dispRecalModelEvals", label = NULL,
+                                                    radioButtons("dispRecalModelEvalsPlot", label = NULL,
                                                                  choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
                                                                  selected = "N")
                                              )
@@ -623,6 +655,16 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                                       "EvalForTable", label = h6("Choose a model applicability evaluation to display."), 
                                                       choices=list("No model evaluations to display"="None"),
                                                       multiple=FALSE, selected="None")
+                                             )
+                                           ),
+                                           fluidRow (
+                                             column(6,
+                                                    h6("Display recalibrated model evaluations?")
+                                             ),
+                                             column(6,
+                                                    radioButtons("dispRecalModelEvalsTable", label = NULL,
+                                                                 choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
+                                                                 selected = "N")
                                              )
                                            ),
                                            DT::dataTableOutput('mytable3')
