@@ -2,13 +2,13 @@ library(rootSolve)
 library(numDeriv)
 
 
-run_model_evals <- function(modeled_data, model_results, model_data_range, successful_models, input) {
+run_model_evals <- function(modeled_data, model_results, model_data_range, ParmInitIntvl, successful_models, input) {
   
   ModelEvalTypes <- c("-lnPL", "PL Ratio", "Bias", "Bias Trend")
-  ParmInitIntvl <- input$parmEstIntvl
   DataStart <- model_data_range[1]
   DataEnd <- model_data_range[2]
   OffsetFailure <- DataStart-1
+  NumPredSteps <- input$modelNumPredSteps
   localEstIntvlEnd <- ParmInitIntvl-DataStart+1
   
   # Set up the data frame in which the results will be returned.
@@ -24,7 +24,8 @@ run_model_evals <- function(modeled_data, model_results, model_data_range, succe
 
   #print(successful_models$MLE)  # Debug code
   
-  if (("FRate" %in% (names(modeled_data))) && !("FCount" %in% (names(modeled_data)))) {
+  #if (("FRate" %in% (names(modeled_data))) && !("FCount" %in% (names(modeled_data)))) {
+  if ("FRate" %in% (names(modeled_data))) {
     # We're dealing with Failure Rates data.
     
     # We'll compute the prequential likelihood, prequential likelihood ratio,
@@ -52,7 +53,7 @@ run_model_evals <- function(modeled_data, model_results, model_data_range, succe
       
       for (k in 1:length(parm_names)) {
         col_name <- paste(model_ID, parm_names[k], "MLE", sep="_")
-        parm_estimates[[parm_names[k]]] <- head(tail(as.array(unlist(model_results[[col_name]])), DataEnd-ParmInitIntvl+2), DataEnd-ParmInitIntvl)
+        parm_estimates[[parm_names[k]]] <- head(tail(as.array(unlist(model_results[[col_name]])), DataEnd-ParmInitIntvl+1+NumPredSteps), DataEnd-ParmInitIntvl)
       }
 
       # Set up parameters to compute model evaluation criteria

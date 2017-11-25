@@ -44,7 +44,7 @@ run_models <- function(raw_data, input, tol_local) {
     FRate_ParmInitIntvl <-  raw_data[["FCount"]][input$parmEstIntvl,][["CFC"]]
     results <- process_models(raw_data, ModeledData, c(FRate_Start,FRate_End), FRate_ParmInitIntvl, OffsetTime, PredAheadSteps, Models2Run, RelMissionTime, tol_local, dataType, ParmConfIntvl)
 
-    if (length(results[["FailedModels"]]) > 0){
+    if (length(results[["FailedModels"]][["MLE"]]) > 0){
       dataType <- "FC"
       if(DataRange[1] == 1) {
           OffsetTime <- 0

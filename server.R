@@ -192,7 +192,13 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         
         # Here we compute prequential likelihood and model bias for the models.
         
-        tempEvalsFrame <- run_model_evals(ModeledData, ModelResults, input$modelDataRange, SuccessfulModels, input)
+        if (("FRate" %in% (names(data_global()))) && !("FCount" %in% (names(data_global())))) {
+          tempEvalsFrame <- run_model_evals(ModeledData, ModelResults, input$modelDataRange, input$parmEstIntvl, SuccessfulModels, input)
+        } else if (("FRate" %in% (names(data_global()))) && ("FCount" %in% (names(data_global())))) {
+          FRate_Start <- max(data_global()[["FCount"]][input$modelDataRange[1],][["CFC"]],1)
+          FRate_End <- data_global()[["FCount"]][input$modelDataRange[2],][["CFC"]]
+          tempEvalsFrame <- run_model_evals(ModeledData, ModelResults, c(FRate_Start, FRate_End), raw_data[["FCount"]][input$parmEstIntvl,][["CFC"]], SuccessfulModels, input)
+        }
         ModelEvalsFrame <<- tempEvalsFrame
         
         # Update the model results selection pull-downs with the names of the
