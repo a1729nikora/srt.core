@@ -166,7 +166,15 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         # Subset the data according to the range we've specified.
         
         ModeledData <<- NULL
-        ModeledData[[names(data_global())]] <<- tail(head(data_global()[[1]], input$modelDataRange[2]), (input$modelDataRange[2]-input$modelDataRange[1]+1))
+        if (("FRate" %in% (names(data_global()))) && !("FCount" %in% (names(data_global())))) {
+          ModeledData[["FRate"]] <<- tail(head(data_global()[["FRate"]], input$modelDataRange[2]), (input$modelDataRange[2]-input$modelDataRange[1]+1))
+        } else if (("FRate" %in% (names(data_global()))) && ("FCount" %in% (names(data_global())))) {
+          ModeledData[["FCount"]] <<- tail(head(data_global()[["FCount"]], input$modelDataRange[2]), (input$modelDataRange[2]-input$modelDataRange[1]+1))
+          FRate_Start <- data_global()[["FCount"]][input$modelDataRange[1],][["CFC"]]
+          FRate_End <- data_global()[["FCount"]][input$modelDataRange[2],][["CFC"]]
+          ModeledData[["FRate"]] <<- tail(head(data_global()[["FRate"]], FRate_End), (FRate_End-FRate_Start+1))
+        }
+        #ModeledData[[names(data_global())]] <<- tail(head(data_global()[[1]], input$modelDataRange[2]), (input$modelDataRange[2]-input$modelDataRange[1]+1))
         raw_data <<- data_global()
         ModeledDataName <<- data_set_global
         

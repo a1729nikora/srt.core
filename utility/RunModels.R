@@ -29,17 +29,20 @@ run_models <- function(raw_data, input, tol_local) {
   } else if (("FRate" %in% (names(raw_data))) && ("FCount" %in% (names(raw_data)))) {
     
     #Runs all FT models if there are failed models in the results, only those are run using FC models
-
+    
+    FRate_Start <- max(raw_data[["FCount"]][input$modelDataRange[1],][["CFC"]],1)
+    FRate_End <- raw_data[["FCount"]][input$modelDataRange[2],][["CFC"]]
     dataType <- "FT"
-        if(DataRange[1] == 1) {
-            OffsetTime <- 0
-          } else {
-            OffsetTime <- tail(head(raw_data$FRate, DataRange[1]-1), 1)[["FT"]]
-          }
-        ModeledData <<- tail(head(raw_data$FRate, DataRange[2]), (DataRange[2]-DataRange[1]+1))
-        ModeledData$FT <- ModeledData$FT - OffsetTime
-        ParmInitIntvl <- input$parmEstIntvl
-        results <- process_models(raw_data, ModeledData, DataRange, ParmInitIntvl, OffsetTime, PredAheadSteps, Models2Run, RelMissionTime, tol_local, dataType, ParmConfIntvl)
+    if(FRate_Start == 1) {
+        OffsetTime <- 0
+    } else {
+        OffsetTime <- tail(head(raw_data$FRate, FRate_Start-1), 1)[["FT"]]
+    }
+    ModeledData <<- tail(head(raw_data[["FRate"]], FRate_End), (FRate_End-FRate_Start+1))
+    ModeledData$FT <- ModeledData$FT - OffsetTime
+    ParmInitIntvl <- input$parmEstIntvl
+    FRate_ParmInitIntvl <-  raw_data[["FCount"]][input$parmEstIntvl,][["CFC"]]
+    results <- process_models(raw_data, ModeledData, c(FRate_Start,FRate_End), FRate_ParmInitIntvl, OffsetTime, PredAheadSteps, Models2Run, RelMissionTime, tol_local, dataType, ParmConfIntvl)
 
     if (length(results[["FailedModels"]]) > 0){
       dataType <- "FC"
