@@ -37,7 +37,7 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
   # Each set of model evaluations is a data frame - there's a
   # separate data frame for each model evaluation that's done.
 
-  ModelEvalsList <- list()
+  ModelEvalsFrame <- list()
 
   # Initialize "constants" ------------------------------------
 
@@ -165,7 +165,20 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         
         # Subset the data according to the range we've specified.
         
+<<<<<<< HEAD
         ModeledData <<- tail(head(data_global(), input$modelDataRange[2]), (input$modelDataRange[2]-input$modelDataRange[1]+1))
+=======
+        ModeledData <<- NULL
+        if (("FRate" %in% (names(data_global()))) && !("FCount" %in% (names(data_global())))) {
+          ModeledData[["FRate"]] <<- tail(head(data_global()[["FRate"]], input$modelDataRange[2]), (input$modelDataRange[2]-input$modelDataRange[1]+1))
+        } else if (("FRate" %in% (names(data_global()))) && ("FCount" %in% (names(data_global())))) {
+          ModeledData[["FCount"]] <<- tail(head(data_global()[["FCount"]], input$modelDataRange[2]), (input$modelDataRange[2]-input$modelDataRange[1]+1))
+          FRate_Start <- data_global()[["FCount"]][input$modelDataRange[1],][["CFC"]]
+          FRate_End <- data_global()[["FCount"]][input$modelDataRange[2],][["CFC"]]
+          ModeledData[["FRate"]] <<- tail(head(data_global()[["FRate"]], FRate_End), (FRate_End-FRate_Start+1))
+        }
+        #ModeledData[[names(data_global())]] <<- tail(head(data_global()[[1]], input$modelDataRange[2]), (input$modelDataRange[2]-input$modelDataRange[1]+1))
+>>>>>>> develop_for_FC
         raw_data <<- data_global()
         ModeledDataName <<- data_set_global
         
@@ -180,6 +193,21 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         FailedModels <<- tempResultsList[["FailedModels"]]
         print("Failed Models")
         print(FailedModels)
+<<<<<<< HEAD
+=======
+        
+        # Here we compute prequential likelihood and model bias for the models.
+        
+        if (("FRate" %in% (names(data_global()))) && !("FCount" %in% (names(data_global())))) {
+          tempEvalsFrame <- run_model_evals(ModeledData, ModelResults, input$modelDataRange, input$parmEstIntvl, SuccessfulModels, input)
+        } else if (("FRate" %in% (names(data_global()))) && ("FCount" %in% (names(data_global())))) {
+          FRate_Start <- max(data_global()[["FCount"]][input$modelDataRange[1],][["CFC"]],1)
+          FRate_End <- data_global()[["FCount"]][input$modelDataRange[2],][["CFC"]]
+          tempEvalsFrame <- run_model_evals(ModeledData, ModelResults, c(FRate_Start, FRate_End), raw_data[["FCount"]][input$parmEstIntvl,][["CFC"]], SuccessfulModels, input)
+        }
+        ModelEvalsFrame <<- tempEvalsFrame
+        
+>>>>>>> develop_for_FC
         # Update the model results selection pull-downs with the names of the
         # models that have been successfully run.
         
@@ -193,6 +221,13 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         updateSelectInput(session, "modelResultChoice", choices = ModelsToShow, selected=ModelsToShow[1])
         updateSelectInput(session, "modelDetailChoice", choices = ModelsToShow, selected=ModelsToShow[1])
         updateSelectInput(session, "modelResultsForEval", choices = ModelsToShow, selected=ModelsToShow[1])
+        
+        # Update drop-down lists of evaluation analyses that can be shown.
+        
+        ModelApplicabilityEvals <- c("lnPL", "PLR", "UPlot", "YPlot")
+        names(ModelApplicabilityEvals) <- c("ln Prequential Likelihood", "Prequential Likelihood Ratio", "Model Bias", "Model Bias Trend")
+        updateSelectInput(session, "EvalToPlot", choices=ModelApplicabilityEvals, selected=ModelApplicabilityEvals[1])
+        updateSelectInput(session, "EvalForTable", choices=ModelApplicabilityEvals, selected=ModelApplicabilityEvals[1])
         
         AllModelsRunNames <- c()
         AllModelsRun <- sort(c(SuccessfulModels, FailedModels))

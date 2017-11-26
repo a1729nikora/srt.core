@@ -1,4 +1,4 @@
-plot_failure_data <- function(in_data, convertedFCData, DataName, DataRange, DataView, PlotType, MinIntervalWidth) {
+plot_failure_data <- function(fail_data_in, convertedFCData, DataName, DataRange, DataView, PlotType, MinIntervalWidth) {
   
   require(ggplot2)
   
@@ -6,16 +6,16 @@ plot_failure_data <- function(in_data, convertedFCData, DataName, DataRange, Dat
   
   DataIntervalStart <- DataRange[1]
   DataIntervalEnd <- DataRange[2]
+
+  if('FCount' %in% names(fail_data_in)){
+    in_data <- fail_data_in$FCount
+  } else if('FRate' %in% names(fail_data_in)){
+    in_data <- fail_data_in$FRate
+  }
+
   # Initialize the plot.
   
   localDataPlot <- ggplot()
-  if('FCount' %in% names(in_data)){
-            convertedFCData <- in_data.FC
-  }
-  
-  if('FRate' %in% names(in_data)){
-  in_data <- in_data.FR
-  }
   
   if((DataIntervalEnd - DataIntervalStart + 1) >= MinIntervalWidth) {
     localDataPlot <- ggplot(,aes_string(x="Index",y="FailureDisplayType"))
@@ -67,13 +67,17 @@ plot_failure_data <- function(in_data, convertedFCData, DataName, DataRange, Dat
       names(plot_data) = c("Index","FailureDisplayType")
       
     } else if((length(grep("CFC",names(in_data)))>0) || (length(grep("FC",names(in_data)))>0)) {
-      FC <- c(unlist(subset(subset(in_data, in_data$TI >= DataIntervalStart, select = c(TI, T, FC, CFC)), TI <= DataIntervalEnd, select = FC)), use.names=FALSE)
-      CFC <- c(unlist(subset(subset(in_data, in_data$TI >= DataIntervalStart, select = c(TI, T, FC, CFC)), TI <= DataIntervalEnd, select = CFC)), use.names=FALSE)
-      CumT <- c(unlist(subset(subset(in_data, in_data$TI >= DataIntervalStart, select = c(TI, T, FC, CFC)), TI <= DataIntervalEnd, select = T)), use.names=FALSE)
-      TI <- c(unlist(subset(subset(in_data, in_data$TI >= DataIntervalStart, select = c(TI, T, FC, CFC)), TI <= DataIntervalEnd, select = TI)), use.names=FALSE)
+      FC <- c(head(tail(in_data$FC, length(in_data$FC)-DataIntervalStart+1), DataIntervalEnd-DataIntervalStart+1))
+      CFC <- c(head(tail(in_data$CFC, length(in_data$CFC)-DataIntervalStart+1), DataIntervalEnd-DataIntervalStart+1))
+      CumT <- c(head(tail(in_data$T, length(in_data$T)-DataIntervalStart+1), DataIntervalEnd-DataIntervalStart+1))
+      FT <- head((c(CumT,0) - c(0,CumT)), length(CumT))
       
-      FT <- c(unlist(subset(subset(convertedFCData, convertedFCData$FC_TI >= DataIntervalStart, select = c(FC_FN, FC_TI, FC_IF, FC_FT)), FC_TI <= DataIntervalEnd, select = FC_FT)), use.names=FALSE)
-      IF <- c(unlist(subset(subset(convertedFCData, convertedFCData$FC_TI >= DataIntervalStart, select = c(FC_FN, FC_TI, FC_IF, FC_FT)), FC_TI <= DataIntervalEnd, select = FC_IF)), use.names=FALSE)
+      #FC <- c(unlist(subset(subset(in_data, in_data$TI >= DataIntervalStart, select = c(T, FC, CFC)), TI <= DataIntervalEnd, select = FC)), use.names=FALSE)
+      #CFC <- c(unlist(subset(subset(in_data, in_data$TI >= DataIntervalStart, select = c(T, FC, CFC)), TI <= DataIntervalEnd, select = CFC)), use.names=FALSE)
+      #CumT <- c(unlist(subset(subset(in_data, in_data$TI >= DataIntervalStart, select = c(T, FC, CFC)), TI <= DataIntervalEnd, select = T)), use.names=FALSE)
+
+      #FT <- c(unlist(subset(subset(convertedFCData, convertedFCData$FC_TI >= DataIntervalStart, select = c(FC_FN, FC_TI, FC_IF, FC_FT)), FC_TI <= DataIntervalEnd, select = FC_FT)), use.names=FALSE)
+      #IF <- c(unlist(subset(subset(convertedFCData, convertedFCData$FC_TI >= DataIntervalStart, select = c(FC_FN, FC_TI, FC_IF, FC_FT)), FC_TI <= DataIntervalEnd, select = FC_IF)), use.names=FALSE)
       
       if((DataView == "FC")) {
         
@@ -87,8 +91,8 @@ plot_failure_data <- function(in_data, convertedFCData, DataName, DataRange, Dat
         
         # Interfailure Times vs. Elapsed Test Time
         
-        plot_data <- data.frame(FT, IF)
-        plot_data$FT <- plot_data$FT + in_data$T[DataIntervalStart]
+        plot_data <- data.frame(CumT, c(FT/FC))
+        #plot_data$FT <- plot_data$FT + in_data$T[DataIntervalStart]
         localDataPlot <- localDataPlot+ggtitle(paste(c("Interfailure Times vs. Cumulative Test Time of"),DataName))
         localDataPlot <- localDataPlot + scale_color_manual(name = "Legend",  labels = c("Cumulative Test Time", "Times Between Successive Failures"),values = c("blue","red"))
         localDataPlot <- localDataPlot + xlab("Cumulative Test Time")+ylab("Times Between Successive Failures")
@@ -96,7 +100,7 @@ plot_failure_data <- function(in_data, convertedFCData, DataName, DataRange, Dat
         
         # Cumulative Failures vs. Elapsed Test Time
         
-        plot_data <- data.frame(CumT, CFC)
+        plot_data <- data.frame(c(CumT), c(CFC))
         localDataPlot <- localDataPlot+ggtitle(paste(c("Cumulative Failures vs. Cumulative Test Time of"),DataName))
         localDataPlot <- localDataPlot + scale_color_manual(name = "Legend",  labels = c("Cumulative Test Time", "Cumulative Number of Failures"),values = c("blue","red"))
         localDataPlot <- localDataPlot + xlab("Cumulative Test Time")+ylab("Cumulative Number of Failures")
@@ -104,7 +108,7 @@ plot_failure_data <- function(in_data, convertedFCData, DataName, DataRange, Dat
         
         # Empirical Failure Intensity vs. Elapsed Test Time
         
-        plot_data <- data.frame(FT, c(1/IF))
+        plot_data <- data.frame(CumT, c(FC/FT))
         localDataPlot <- localDataPlot+ggtitle(paste(c("Empirical Failure Intensity vs. Cumulative Test Time of"),DataName))
         localDataPlot <- localDataPlot + scale_color_manual(name = "Legend",  labels = c("Cumulative Test Time", "Number of Failures per Unit Time"),values = c("blue","red"))
         localDataPlot <- localDataPlot + xlab("Cumulative Test Time")+ylab("Number of Failures per Unit Time")

@@ -60,8 +60,8 @@ getFileType <- function(inFile){
         if ("FRate" %in% names(data_generated) && !("FCount" %in% names(data_generated))) {
             DataModelIntervalEnd <<- length(data_generated$FRate[,1])
         } else {
-            DataModelIntervalEnd <<- length(data_generated$FRate[,1])
-            #DataModelIntervalEnd <<- length(data_generated$FCount[,1])
+            #DataModelIntervalEnd <<- length(data_generated$FRate[,1])
+            DataModelIntervalEnd <<- length(data_generated$FCount[,1])
         }
 
         if((DataModelIntervalEnd - DataModelIntervalStart + 1) < K_minDataModelIntervalWidth){
@@ -130,7 +130,8 @@ getFileType <- function(inFile){
       #if (!(is.null(input$file) && (input$type == 2)) || (!(is.null(input$dataSheetChoice)) && (input$type == 1))) {
       if(!(is.null(input$file))){
         if (input$DataPlotAndTableTabset == "Data and Trend Test Table") {
-          data <- data.frame(x=data_global()$FRate)
+          #data <- data.frame(x=data_global()$FRate)
+          data <- data_global()
           DataTrendTable <- data_or_trend_table(data, input$modelDataRange, input$PlotDataOrTrend, input$trendPlotChoice)
         }
       }
@@ -201,12 +202,12 @@ getFileType <- function(inFile){
       data <- data_global()
       
       if(!is.null(data)){
-        data <- data$FRate
-        DataColNames <- names(data)
-        names(data) <- gsub("x.", "", DataColNames)
-        if(length(names(data)) > 1) {
-            Time <- names(data[1]) # generic name of column name of data frame (x-axis)
-            Failure <- names(data[2]) # (y-axis)
+        #data <- data$FRate
+        #DataColNames <- names(data)
+        #names(data) <- gsub("x.", "", DataColNames)
+        if(length(names(data)) >= 1) {
+            #Time <- names(data[1]) # generic name of column name of data frame (x-axis)
+            #Failure <- names(data[2]) # (y-axis)
             
             data_set <- input$dataSheetChoice
             if(input$PlotDataOrTrend == 1){

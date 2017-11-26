@@ -1,10 +1,10 @@
 ###############################################################################
-#Tab4 Table Section
+#Tab4 Summary Table Section
 ###############################################################################
 
-# ------------------------------------------------------------------------------------------------------
+  # --------------------------------------------------------------------------------------------------------
   # ------------------------------------------------------------------------------------------------------
-  # ----------------------------------------   TAB4 Table   ----------------------------------------------
+  # ------------------------------------   TAB4 Summary Table   ------------------------------------------
   # ------------------------------------------------------------------------------------------------------
   # ------------------------------------------------------------------------------------------------------
 
@@ -92,33 +92,69 @@
 
   output$saveModelEvals <- downloadHandler(
     filename = function() {
-      if(input$saveModelEvalType == "PDF") {
-        paste(paste0(ModeledDataName, "_Model_Evals"), "pdf", sep=".")
-      } else {
-        paste(paste0(ModeledDataName, "_Model_Evals"), "csv", sep=".")
+      data_set_name <- input$dataSheetChoice
+      if(input$ModelEvaluationTabset == "Model Evaluation Plot") {
+        
+        # Save model results plot.
+        
+        paste(paste0(data_set_name, "_Results_", input$EvalToPlot), input$saveModelEvalsType, sep=".")
+      } else if (input$ModelEvaluationTabset == "Model Evaluation Table") {
+        
+        # Save model results table.
+        
+        paste(paste0(data_set_name, "_Model_Evals"), "csv", sep=".")
+      } else if (input$ModelEvaluationTabset == "Evaluation Summary") {
+        
+        # Save model evaluation summary.
+        
+        if(input$saveModelEvalSummaryType == "PDF") {
+          paste(paste0(data_set_name, "_Eval_Summary"), "pdf", sep=".")
+        } else {
+          paste(paste0(data_set_name, "_Eval_Summary"), "csv", sep=".")
+        }
       }
     },
     content = function(filespec) {
-      tab4_table1_2_save <- tab4_table1
-      
-      # Turn OutputTable to character representations to avoid
-      # difficulties with NA, Inf, and NaN.
-      
-      TableNames <- names(tab4_table1_2_save)
-      for (nameIndex in TableNames) {
-        tab4_table1_2_save[[nameIndex]] <- as.character(tab4_table1_2_save[[nameIndex]])
-      }
-      names(tab4_table1_2_save) <- c("Model", "AIC", "PSSE")
-      
-      if(length(tab4_table1_2_save) <= 1) {
-        tab4_table1_2_save <- data.frame()
-      }
-      
-      if(input$saveModelEvalType == "PDF") {
-        out_put = knit2pdf('Tab4ReportTemplate.Rnw', clean = TRUE)
-        file.rename(out_put, filespec) # move pdf to file for downloading
-      } else {
-        utils::write.csv(tab4_table1_2_save, file=filespec, quote=TRUE, na="NA")
+      if(input$ModelEvaluationTabset == "Model Evaluation Plot") {
+        ggsave(filespec, plot=MEPlot, width=20,height=15)
+      } else if (input$ModelEvaluationTabset == "Evaluation Summary") {
+        tab4_table1_2_save <- tab4_table1
+        
+        # Turn OutputTable to character representations to avoid
+        # difficulties with NA, Inf, and NaN.
+        
+        TableNames <- names(tab4_table1_2_save)
+        for (nameIndex in TableNames) {
+          tab4_table1_2_save[[nameIndex]] <- as.character(tab4_table1_2_save[[nameIndex]])
+        }
+        names(tab4_table1_2_save) <- c("Model", "AIC", "PSSE")
+        
+        if(length(tab4_table1_2_save) <= 1) {
+          tab4_table1_2_save <- data.frame()
+        }
+        
+        if(input$saveModelEvalSummaryType == "PDF") {
+          out_put = knit2pdf('Tab4ReportTemplate.Rnw', clean = TRUE)
+          file.rename(out_put, filespec) # move pdf to file for downloading
+        } else {
+          utils::write.csv(tab4_table1_2_save, file=filespec, quote=TRUE, na="NA")
+        }
+      } else if (input$ModelEvaluationTabset == "Model Evaluation Table") {
+        OutputTable <- ModelEvalsFrame
+        
+        # Turn OutputTable to character representations to avoid
+        # difficulties with NA, Inf, and NaN.
+        
+        TableNames <- names(OutputTable)
+        for (nameIndex in TableNames) {
+          OutputTable[[nameIndex]] <- as.character(OutputTable[[nameIndex]])
+        }
+        
+        if(length(OutputTable) > 1) {
+        } else {
+          OutputTable <- data.frame()
+        }
+        utils::write.csv(OutputTable, file=filespec, quote=TRUE, na="NA")
       }
     }
   )
@@ -164,3 +200,94 @@
 ###############################################################################
 #Tab4 Plot Section
 ###############################################################################
+
+  # A reactive data item that is used to control the height of the model evals
+  # plot.  The height is computed based on the width - it the plot is not as high
+  # as it is wide, and if the width exceeds a minimum, then the height catches up with
+  # the width to make a square plot.
+  
+  MP_height <- reactive({
+    Width <- session$clientData$output_ModelEvaluationPlot_width
+    Height <- session$clientData$output_ModelEvaluationPlot_height
+    if((Width > Height) && (Width > 400)) {
+      Height <- Width*0.75
+    }
+    Height
+  })
+  
+  # Read the position of the mouse for the model results plot
+  
+  MPranges <- reactiveValues(x = NULL, y = NULL)
+  
+  # Event observer for double-click on model results plot.
+  # Double click and brush zooms in and out.
+  
+  observeEvent(input$MEPdblclick, {
+    MPbrush <- input$MEP_brush
+    if (!is.null(MPbrush)) {
+      MPranges$x <- c(MPbrush$xmin, MPbrush$xmax)
+      MPranges$y <- c(MPbrush$ymin, MPbrush$ymax)
+      
+    } else {
+      MPranges$x <- NULL
+      MPranges$y <- NULL
+    }
+  })
+  
+  
+# ------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
+# ------------------------------------   TAB4 Evaluations Plot   ---------------------------------------
+# ------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
+  
+  output$ModelEvaluationPlot <- renderPlot({
+    data_set <- input$dataSheetChoice
+    MEPlot <<-NULL
+    if((length(input$modelResultsForEval) > 0) && (input$modelResultsForEval[1] != "None") && (!is.null(ModelEvalsFrame))) {
+      MEPlot <<- plot_model_evals(ModelEvalsFrame, data_set, input, MPranges$x, MPranges$y, session$clientData$output_ModelPlot_width)
+      if(!is.null(MEPlot)) {
+        MEPlot <<- MEPlot + coord_cartesian(xlim = MPranges$x, ylim = MPranges$y)
+      }
+    }
+    MEPlot
+  }, height=MP_height)
+  
+
+###############################################################################
+#Tab4 Evaluation Detail Table Section
+###############################################################################
+  
+# ------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
+# --------------------------------   TAB4 Evaluations Detail Table   -----------------------------------
+# ------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------
+
+  
+  output$mytable3 <- DT::renderDataTable({
+    ModelEvalTypes <- c("-lnPL", "PL Ratio", "Bias", "Bias Trend")
+    
+    ME_Table <- NULL
+    
+    # Check if modelResultChoice is None and return NULL if true
+    if(length(input$modelResultsForEval)==0){
+      return(ME_Table)
+    }
+    if(input$modelResultsForEval[1]=="None"){
+      return(ME_Table)
+    }
+    if(is.null(ModelEvalsFrame)){
+      return
+    } else if(!is.null(ModelEvalsFrame)) {
+      if(length(input$modelResultsForEval) > 0) {
+        
+        # User has selected at least one set of model evaluations to display as a table.
+        
+        ME_Table <- model_eval_table(ModelEvalsFrame, input$modelResultsForEval, input)
+      }
+    }
+    ME_Table = round_table(ME_Table, 6)
+    ME_Table
+  }, filter="top", options = list(scrollX=TRUE, lengthMenu = list(c(10, 25, 50, -1), c('10', '25', '50', 'All'))))
+    

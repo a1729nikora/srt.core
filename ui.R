@@ -3,7 +3,7 @@ library(shiny)
 #source("custom_functions.R")
 tags$head(includeScript("analytics/google-analytics.js"))
 tags$head()
-shinyUI(navbarPage("Software Reliability Assessment in R",
+shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                    tabPanel("Select, Analyze, and Filter Data",
                             
                             sidebarLayout(
@@ -113,7 +113,7 @@ shinyUI(navbarPage("Software Reliability Assessment in R",
                    tabPanel("Set Up and Apply Models",
                             
                             sidebarLayout(
-                              sidebarPanel(h4("Configure and Apply Models"),
+                              sidebarPanel(h4("Set Up and Apply Models"),
                                            h5("Specify the number of failures for which the models will make predictions"),
                                            
                                            fluidRow(
@@ -232,12 +232,76 @@ shinyUI(navbarPage("Software Reliability Assessment in R",
                               
                               mainPanel(
                                 tabsetPanel(
+<<<<<<< HEAD
                                   tabPanel("Model Result Plot", textOutput("ModelConfigError"), textOutput("UnsuccessfulModels"), plotOutput("ModelPlot", dblclick="MPdblclick", brush=brushOpts(id="MP_brush", resetOnNew=TRUE))), 
                                   tabPanel("Model Result Table",
                                            selectInput(
                                              "AllModelsRun", label = h6("Choose one or more sets of model results to display."), 
                                              choices=list("No model results to display"="None"),
                                              multiple=TRUE, selected="None"),
+=======
+                                  tabPanel("Model Result Plot", 
+                                           textOutput("ModelConfigError"),
+                                           textOutput("UnsuccessfulModels"),
+                                           fluidRow (
+                                             column(5,
+                                                    h6("Show most likely parameter values or confidence bounds.")
+                                             ),
+                                             column(2,
+                                                    checkboxInput("LowConfOnRsltPlot", label = "Low", value = FALSE)
+                                             ),
+                                             column(3,
+                                                    checkboxInput("MLEOnRsltPlot", label = "Most Likely", value = TRUE)
+                                             ),
+                                             column(2,
+                                                    checkboxInput("HighConfOnRsltPlot", label = "High", value = FALSE)
+                                             )
+                                           ),
+                                           fluidRow (
+                                             column(6,
+                                                    h6("Display recalibrated model results?")
+                                                    ),
+                                             column(6,
+                                                    radioButtons("dispRecalModelResultsPlot", label = NULL,
+                                                                 choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
+                                                                 selected = "N")
+                                             )
+                                           ),
+                                           plotOutput("ModelPlot", dblclick="MPdblclick", brush=brushOpts(id="MP_brush", resetOnNew=TRUE))), 
+                                  tabPanel("Model Result Table",
+                                           fluidRow (
+                                             column(6,
+                                                    selectInput(
+                                                      "AllModelsRun", label = h6("Choose one or more sets of model results to display."), 
+                                                      choices=list("No model results to display"="None"),
+                                                      multiple=TRUE, selected="None")
+                                             ),
+                                             fluidRow(
+                                               column(6,
+                                                      h6("Show most likely parameter values or confidence bounds.")
+                                                      ),
+                                               column(1,
+                                                      checkboxInput("LowConfOnTable", label = "Low", value = FALSE)
+                                               ),
+                                               column(3,
+                                                      checkboxInput("MLEOnTable", label = "Most Likely", value = TRUE)
+                                               ),
+                                               column(2,
+                                                      checkboxInput("HighConfOnTable", label = "High", value = FALSE)
+                                               )
+                                             )
+                                           ),
+                                           fluidRow (
+                                             column(6,
+                                                    h6("Display recalibrated model results?")
+                                             ),
+                                             column(6,
+                                                    radioButtons("dispRecalModelResultsTable", label = NULL,
+                                                                 choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
+                                                                 selected = "N")
+                                             )
+                                           ),
+>>>>>>> develop_for_FC
                                            DT::dataTableOutput("ModelResultTable")),
                                   id="ModelPlotAndTableTabset"), width=8
                               )
@@ -346,11 +410,66 @@ shinyUI(navbarPage("Software Reliability Assessment in R",
                               mainPanel(
                                 tabsetPanel(
                                   tabPanel("Prediction table",
+<<<<<<< HEAD
                                     DT::dataTableOutput('mytable1')
+=======
+                                           fluidRow(
+                                             column(5,
+                                                    h6("Show most likely parameter values or confidence bounds.")
+                                             ),
+                                             column(2,
+                                                    checkboxInput("LowConfOnQueryTbl", label = "Low", value = FALSE)
+                                             ),
+                                             column(3,
+                                                    checkboxInput("MLEOnQueryTbl", label = "Most Likely", value = TRUE)
+                                             ),
+                                             column(2,
+                                                    checkboxInput("HighConfOnQueryTbl", label = "High", value = FALSE)
+                                             )
+                                           ),
+                                           fluidRow (
+                                             column(6,
+                                                    h6("Display recalibrated model predictions?")
+                                             ),
+                                             column(6,
+                                                    radioButtons("dispRecalModelPredsTable", label = NULL,
+                                                                 choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
+                                                                 selected = "N")
+                                             )
+                                           ),
+                                           DT::dataTableOutput('mytable1')
+>>>>>>> develop_for_FC
                                     ),
                                   tabPanel("Model Prediction Result Plot", 
                                     # textOutput("ModelConfigError"), 
                                     # textOutput("UnsuccessfulModels"), 
+<<<<<<< HEAD
+=======
+                                    fluidRow(
+                                      column(5,
+                                             h6("Show most likely parameter values or confidence bounds.")
+                                      ),
+                                      column(2,
+                                             checkboxInput("LowConfOnQueryPlot", label = "Low", value = FALSE)
+                                      ),
+                                      column(3,
+                                             checkboxInput("MLEOnQueryPlot", label = "Most Likely", value = TRUE)
+                                      ),
+                                      column(2,
+                                             checkboxInput("HighConfOnQueryPlot", label = "High", value = FALSE)
+                                      )
+                                    ),
+                                    fluidRow (
+                                      column(6,
+                                             h6("Display recalibrated model predictions?")
+                                      ),
+                                      column(6,
+                                             radioButtons("dispRecalModelPredsPlot", label = NULL,
+                                                          choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
+                                                          selected = "N")
+                                      )
+                                    ),
+>>>>>>> develop_for_FC
                                     plotOutput("ModelPredictionPlot", dblclick="MPdblclick1", brush=brushOpts(id="MP_brush1", resetOnNew=TRUE))
                                     ),
                                  # DT::dataTableOutput('mytable1')
@@ -397,8 +516,20 @@ shinyUI(navbarPage("Software Reliability Assessment in R",
                                                                  value = .90)
                                              ),
                                              
+                                            column(12, 
+                                                    radioButtons("ModelEvalPlotType", label = h6("Draw the plot with data points and lines, points only, or lines only?"),
+                                                                 choices = list("Both" = "points_and_lines", "Points" = "points", "Lines" = "lines"), inline = TRUE,
+                                                                 selected = "points_and_lines")
+                                             ),
+
+                                            column(12, 
+                                                     radioButtons("saveModelEvalsType", label = h6("Choose the type of file to save plots.  The Model Evaluation Table is saved as a CSV file."),
+                                                                  choices = list("JPEG" = "JPG", "PDF" = "PDF", "PNG" = "PNG", "TIFF" = "TIFF"), inline = TRUE,
+                                                                  selected = "JPG")
+                                             ),
+  
                                              column(12, 
-                                                    radioButtons("saveModelEvalType", label = h6("Save model evaluations as PDF or CSV?"),
+                                                    radioButtons("saveModelEvalSummaryType", label = h6("Save the model evaluation summary as PDF or CSV?"),
                                                                  choices = list("CSV" = "CSV", "PDF" = "PDF"), inline = TRUE,
                                                                  selected = "CSV"),
                                                     downloadButton('saveModelEvals', 'Save Model Evaluations')
@@ -492,9 +623,63 @@ shinyUI(navbarPage("Software Reliability Assessment in R",
                               
                               mainPanel(
                                 tabsetPanel(
-                                  tabPanel('Table',DT::dataTableOutput('mytable2'))
-                                  #tabPanel("Plot",plotOutput("Evalationplot"))
-                                )                              
+                                  #tabPanel("Plot",plotOutput("Evalutionplot"))
+                                  tabPanel("Model Evaluation Summary",
+                                           fluidRow (
+                                             column(6,
+                                                    h6("Display recalibrated model evaluations?")
+                                             ),
+                                             column(6,
+                                                    radioButtons("dispRecalModelEvalsSummary", label = NULL,
+                                                                 choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
+                                                                 selected = "N")
+                                             )
+                                           ),
+                                           DT::dataTableOutput('mytable2')
+                                  ),
+                                  tabPanel("Model Evaluation Plot",
+                                           fluidRow (
+                                             column(12,
+                                               selectInput(
+                                                 "EvalToPlot", label = h6("Choose a model applicability evaluation to plot."), 
+                                                 choices=list("No model evaluations to plot"="None"),
+                                                 multiple=FALSE, selected="None") 
+                                             )
+                                           ),
+                                           fluidRow (
+                                             column(6,
+                                                    h6("Display recalibrated model evaluations?")
+                                             ),
+                                             column(6,
+                                                    radioButtons("dispRecalModelEvalsPlot", label = NULL,
+                                                                 choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
+                                                                 selected = "N")
+                                             )
+                                           ),
+                                           plotOutput("ModelEvaluationPlot", dblclick="MEPdblclick", brush=brushOpts(id="MEP_brush", resetOnNew=TRUE))
+                                  ),
+                                  tabPanel("Model Evaluation Table",
+                                           fluidRow (
+                                             column(12,
+                                                    selectInput(
+                                                      "EvalForTable", label = h6("Choose a model applicability evaluation to display."), 
+                                                      choices=list("No model evaluations to display"="None"),
+                                                      multiple=FALSE, selected="None")
+                                             )
+                                           ),
+                                           fluidRow (
+                                             column(6,
+                                                    h6("Display recalibrated model evaluations?")
+                                             ),
+                                             column(6,
+                                                    radioButtons("dispRecalModelEvalsTable", label = NULL,
+                                                                 choices = list("Yes" = "Y", "No" = "N"), inline = TRUE,
+                                                                 selected = "N")
+                                             )
+                                           ),
+                                           DT::dataTableOutput('mytable3')
+                                  ),
+                                  id="ModelEvaluationTabset"), width = 8                              
                               )
                             )
                    )

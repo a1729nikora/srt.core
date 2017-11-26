@@ -1,15 +1,31 @@
-plot_trend_tests <- function(in_data, convertedFCData, DataName, DataRange, TrendTest, Confidence, LaplaceStat, PlotType, MinIntervalWidth){
+plot_trend_tests <- function(fail_data_in, convertedFCData, DataName, DataRange, TrendTest, Confidence, LaplaceStat, PlotType, MinIntervalWidth){
   
   require(ggplot2)
   
   PlotFault <- FALSE
   
-  DataIntervalStart <- DataRange[1]
-  DataIntervalEnd <- DataRange[2]
+  # Since the Laplace Test can't be computed for failure counts data
+  # if the intervals are of unequal length, we use the times between
+  # failures version of the data even if the original version is
+  # failure counts.
   
-  # Initialize the plot
+  in_data <- fail_data_in$FRate
   
-  localTrendPlot <- ggplot()
+  if('FCount' %in% names(fail_data_in)){
+    if(DataRange[1]==1){
+      DataIntervalStart <- 1
+    } else {
+      DataIntervalStart <- fail_data_in$FCount$CFC[(DataRange[1]-1)+1]
+    }
+    DataIntervalEnd <- fail_data_in$FCount$CFC[DataRange[2]]
+  } else {
+    DataIntervalStart <- DataRange[1]
+    DataIntervalEnd <- DataRange[2]
+  }
+
+  # Initialize the plot.
+  
+  localDataPlot <- ggplot()
   
   if((DataIntervalEnd - DataIntervalStart + 1) >= MinIntervalWidth) {
     localTrendPlot <- ggplot(,aes_string(x="index",y="trend_test_statistic"))
