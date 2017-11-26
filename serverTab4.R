@@ -13,19 +13,18 @@
     if(dataType(names(data))=="FR"){
       #model_params <- try(get(paste(model,get(paste(model,"methods",sep="_"))[1],"MLE",sep="_"))(get(paste("data"))[[get(paste(model,"input",sep="_"))]]),silent=TRUE)
       last_row <- length(ModelResults[,1]) - PredAheadSteps
-      model_params_label <- paste(model,"params",sep="_")
-      model_params <- as.data.frame(matrix(0, ncol=length(get(model_params_label)), nrow = 1))
-
+      model_params <- as.data.frame(matrix(0, ncol=length(ModelResults[1,]), nrow = 1))
+      colnames(model_params) <- colnames(ModelResults)
+      
       #Generating model_params from ModelResults. If the column is a list, it is converted to numeric
-      
-      parmNames <- c()
-      for (paramNum in 1:length(get(model_params_label))) {
-        model_parm_num <- paste0(model, "_", get(model_params_label)[paramNum], "_MLE")
-        parmNames <- c(parmNames, model_parm_num)
-        model_params[1,paramNum] <- ModelResults[[model_parm_num]][last_row]
+      for(i in 1:length(model_params[1,])){
+        if (typeof(model_params[1,i]) == "list"){
+            model_params[1, i] <- as.numeric(ModelResults[1,i][[1]])
+        }
+        else{
+            model_params[1, i] <- ModelResults[last_row, i]
+        }
       }
-      colnames(model_params) <- parmNames
-      
       if(typeof(model_params)!="character"){
         # number_fails <- get_prediction_n(model_params,input$modelDetailPredTime,length(get("data")[[get(paste(model,"input",sep="_"))]]))
         #max_lnL <- try(get(paste(model,"lnL",sep="_"))(get("data")[[get(paste(model,"input",sep="_"))]],model_params),silent=TRUE)
@@ -33,11 +32,11 @@
         #print(data_global()$FRate['FT'])
 
         if ("FT" %in% get(paste(model,"input",sep="_"))){
-            max_lnL <- try(get(paste(model,"FT","lnL",sep="_"))(model_params, parmNames,FALSE,data_global()$FRate$FT),silent=FALSE)
+            max_lnL <- try(get(paste(model,"lnL",sep="_"))(data_global()$FRate$FT,model_params),silent=FALSE)
             
         } else if ("IF" %in% get(paste(model,"input",sep="_"))){
             
-            max_lnL <- try(get(paste(model,"FT","lnL",sep="_"))(model_params, parmNames,FALSE,data_global()$FRate$IF),silent=FALSE)
+            max_lnL <- try(get(paste(model,"lnL",sep="_"))(data_global()$FRate$IF,model_params),silent=FALSE)
             
         } else {
             print("NOTHING found!")
