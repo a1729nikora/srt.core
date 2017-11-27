@@ -77,7 +77,8 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
       sliderInput("parmEstIntvl", h6("Specify the last data point for the initial parameter estimation interval."),
                   min=intervalStart, max=intervalEnd-1, value=initParmIntervalEnd, step=1)
     })
-  
+
+    
     LPTestStatistic <- reactive({
       if(input$trendPlotChoice=="LP") {
         testStat <- qnorm(1-input$confidenceLP)
@@ -133,6 +134,13 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         
         updateSliderInput(session, "modelDataRange", value = c(DataModelIntervalStart, DataModelIntervalEnd))
       }  
+
+      if (("FRate" %in% (names(data_global()))) && !("FCount" %in% (names(data_global())))) {
+        updateNumericInput(session, "modelCurveAdditionalTime", value=(data_global()[["FRate"]][["FT"]][DataModelIntervalEnd]/20))
+      } else if (("FRate" %in% (names(data_global()))) && ("FCount" %in% (names(data_global())))) {
+        updateNumericInput(session, "modelCurveAdditionalTime", value=(data_global()[["FCount"]][["T"]][DataModelIntervalEnd]/20))
+      }
+      
       # updateSliderInput(session, "parmEstIntvl",
       #                  min = DataModelIntervalStart, value = ceiling(DataModelIntervalStart + (DataModelIntervalEnd - DataModelIntervalStart - 1)/2),
       #                  max = DataModelIntervalEnd-1)    
