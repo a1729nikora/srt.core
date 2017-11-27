@@ -69,15 +69,15 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
     # This slider that controls the end of the initial parameter estimation interval
     # is dynamically created to ensure that its value is always in sync with those of
     # the start and end points of the current data range.
-    
-  #  output$ParameterInterval <- renderUI({
-  #    intervalStart <- input$modelDataRange[1]
-  #    intervalEnd <- input$modelDataRange[2]
-  #    initParmIntervalEnd <- ceiling(intervalStart + (intervalEnd - intervalStart - 1)/2)
-  #    sliderInput("parmEstIntvl", h6("Specify the last data point for the initial parameter estimation interval."),
-  #                min=intervalStart, max=intervalEnd-1, value=initParmIntervalEnd, step=1)
-  #  })
-    
+
+    output$ParameterInterval <- renderUI({
+      intervalStart <- input$modelDataRange[1]
+      intervalEnd <- input$modelDataRange[2]
+      initParmIntervalEnd <- ceiling(intervalStart + (intervalEnd - intervalStart - 1)/2)
+      sliderInput("parmEstIntvl", h6("Specify the last data point for the initial parameter estimation interval."),
+                  min=intervalStart, max=intervalEnd-1, value=initParmIntervalEnd, step=1)
+    })
+  
     LPTestStatistic <- reactive({
       if(input$trendPlotChoice=="LP") {
         testStat <- qnorm(1-input$confidenceLP)
@@ -189,7 +189,7 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         FailedModels <<- tempResultsList[["FailedModels"]]
         print("Failed Models")
         print(FailedModels)
-
+        
         # Here we compute prequential likelihood and model bias for the models.
         
         if (("FRate" %in% (names(data_global()))) && !("FCount" %in% (names(data_global())))) {
@@ -204,10 +204,10 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         # Update the model results selection pull-downs with the names of the
         # models that have been successfully run.
         
-        ModelsToShow <- as.list(SuccessfulModels)
+        ModelsToShow <- as.list(SuccessfulModels[["MLE"]])
         ModelsToShowNames <- c()
         for (ModelsToShowIndex in 1:length(ModelsToShow)) {
-          ModelsToShowNames <- c(ModelsToShowNames, get(paste(SuccessfulModels[ModelsToShowIndex], "fullname", sep="_"))) 
+          ModelsToShowNames <- c(ModelsToShowNames, get(paste(SuccessfulModels[["MLE"]][ModelsToShowIndex], "fullname", sep="_"))) 
         }
         names(ModelsToShow) <- ModelsToShowNames
         
@@ -223,7 +223,7 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         updateSelectInput(session, "EvalForTable", choices=ModelApplicabilityEvals, selected=ModelApplicabilityEvals[1])
         
         AllModelsRunNames <- c()
-        AllModelsRun <- sort(c(SuccessfulModels, FailedModels))
+        AllModelsRun <- sort(c(SuccessfulModels[["MLE"]], FailedModels[["MLE"]]))
         for (ModelsToShowIndex in 1:length(AllModelsRun)) {
           AllModelsRunNames <- c(AllModelsRunNames, get(paste(AllModelsRun[ModelsToShowIndex], "fullname", sep="_"))) 
         }
