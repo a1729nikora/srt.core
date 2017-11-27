@@ -9,13 +9,13 @@ run_model_evals <- function(modeled_data, model_results, model_data_range, ParmI
   DataEnd <- model_data_range[2]
   OffsetFailure <- DataStart-1
   NumPredSteps <- input$modelNumPredSteps
-  localEstIntvlEnd <- ParmInitIntvl-DataStart+1
+  #localEstIntvlEnd <- ParmInitIntvl-DataStart+1
   
   # Set up the data frame in which the results will be returned.
 
   localEvalsFrame <- matrix(data=NA, nrow=(DataEnd-ParmInitIntvl), ncol=1+(length(ModelEvalTypes)*length(successful_models$MLE)))
   evalNames <- c("Failure Number")
-  localEvalsFrame[,1] <- c(localEstIntvlEnd:(DataEnd-1))
+  localEvalsFrame[,1] <- c(ParmInitIntvl:(DataEnd-1))
   for (k in 1:length(ModelEvalTypes)) {
     evalNames <- c(evalNames, paste(c(successful_models$MLE), ModelEvalTypes[k], sep="_"))
   }
