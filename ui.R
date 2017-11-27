@@ -201,7 +201,7 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                              column(12,
                                                     numericInput("modelCurveAdditionalTime",
                                                                  label=h6("Enter the duration for which the model results curves should extend beyond the last prediction point."),
-                                                                 min=0, value=100, step=1000)
+                                                                 min=0, value=100, step=10)
                                                     )
                                            ),
                                            
