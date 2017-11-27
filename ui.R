@@ -232,14 +232,6 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                               
                               mainPanel(
                                 tabsetPanel(
-<<<<<<< HEAD
-                                  tabPanel("Model Result Plot", textOutput("ModelConfigError"), textOutput("UnsuccessfulModels"), plotOutput("ModelPlot", dblclick="MPdblclick", brush=brushOpts(id="MP_brush", resetOnNew=TRUE))), 
-                                  tabPanel("Model Result Table",
-                                           selectInput(
-                                             "AllModelsRun", label = h6("Choose one or more sets of model results to display."), 
-                                             choices=list("No model results to display"="None"),
-                                             multiple=TRUE, selected="None"),
-=======
                                   tabPanel("Model Result Plot", 
                                            textOutput("ModelConfigError"),
                                            textOutput("UnsuccessfulModels"),
@@ -301,7 +293,6 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                                                  selected = "N")
                                              )
                                            ),
->>>>>>> develop_for_FC
                                            DT::dataTableOutput("ModelResultTable")),
                                   id="ModelPlotAndTableTabset"), width=8
                               )
@@ -410,9 +401,6 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                               mainPanel(
                                 tabsetPanel(
                                   tabPanel("Prediction table",
-<<<<<<< HEAD
-                                    DT::dataTableOutput('mytable1')
-=======
                                            fluidRow(
                                              column(5,
                                                     h6("Show most likely parameter values or confidence bounds.")
@@ -438,13 +426,10 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                              )
                                            ),
                                            DT::dataTableOutput('mytable1')
->>>>>>> develop_for_FC
                                     ),
                                   tabPanel("Model Prediction Result Plot", 
                                     # textOutput("ModelConfigError"), 
                                     # textOutput("UnsuccessfulModels"), 
-<<<<<<< HEAD
-=======
                                     fluidRow(
                                       column(5,
                                              h6("Show most likely parameter values or confidence bounds.")
@@ -469,7 +454,6 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                                           selected = "N")
                                       )
                                     ),
->>>>>>> develop_for_FC
                                     plotOutput("ModelPredictionPlot", dblclick="MPdblclick1", brush=brushOpts(id="MP_brush1", resetOnNew=TRUE))
                                     ),
                                  # DT::dataTableOutput('mytable1')

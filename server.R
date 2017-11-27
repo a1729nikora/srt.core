@@ -165,9 +165,6 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         
         # Subset the data according to the range we've specified.
         
-<<<<<<< HEAD
-        ModeledData <<- tail(head(data_global(), input$modelDataRange[2]), (input$modelDataRange[2]-input$modelDataRange[1]+1))
-=======
         ModeledData <<- NULL
         if (("FRate" %in% (names(data_global()))) && !("FCount" %in% (names(data_global())))) {
           ModeledData[["FRate"]] <<- tail(head(data_global()[["FRate"]], input$modelDataRange[2]), (input$modelDataRange[2]-input$modelDataRange[1]+1))
@@ -178,7 +175,6 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
           ModeledData[["FRate"]] <<- tail(head(data_global()[["FRate"]], FRate_End), (FRate_End-FRate_Start+1))
         }
         #ModeledData[[names(data_global())]] <<- tail(head(data_global()[[1]], input$modelDataRange[2]), (input$modelDataRange[2]-input$modelDataRange[1]+1))
->>>>>>> develop_for_FC
         raw_data <<- data_global()
         ModeledDataName <<- data_set_global
         
@@ -193,9 +189,7 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         FailedModels <<- tempResultsList[["FailedModels"]]
         print("Failed Models")
         print(FailedModels)
-<<<<<<< HEAD
-=======
-        
+
         # Here we compute prequential likelihood and model bias for the models.
         
         if (("FRate" %in% (names(data_global()))) && !("FCount" %in% (names(data_global())))) {
@@ -207,7 +201,6 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
         }
         ModelEvalsFrame <<- tempEvalsFrame
         
->>>>>>> develop_for_FC
         # Update the model results selection pull-downs with the names of the
         # models that have been successfully run.
         

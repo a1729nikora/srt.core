@@ -31,19 +31,6 @@ run_models <- function(raw_data, input, tol_local) {
     FRate_Start <- max(raw_data[["FCount"]][input$modelDataRange[1],][["CFC"]],1)
     FRate_End <- raw_data[["FCount"]][input$modelDataRange[2],][["CFC"]]
     dataType <- "FT"
-<<<<<<< HEAD
-        if(DataRange[1] == 1) {
-            OffsetTime <- 0
-          } else {
-            OffsetTime <- tail(head(raw_data$FRate, DataRange[1]-1), 1)[["FT"]]
-          }
-        ModeledData <<- tail(head(raw_data$FRate, DataRange[2]), (DataRange[2]-DataRange[1]+1))
-        ModeledData$FT <- ModeledData$FT - OffsetTime
-        ParmInitIntvl <- length(ModeledData[,1])
-        results <- process_models(raw_data, ModeledData, DataRange, ParmInitIntvl, OffsetTime, PredAheadSteps, Models2Run, RelMissionTime, tol_local, dataType)
-    
-    if (length(results[["FailedModels"]]) > 0){
-=======
     if(FRate_Start == 1) {
         OffsetTime <- 0
     } else {
@@ -56,7 +43,6 @@ run_models <- function(raw_data, input, tol_local) {
     results <- process_models(raw_data, ModeledData, c(FRate_Start,FRate_End), FRate_ParmInitIntvl, OffsetTime, PredAheadSteps, Models2Run, RelMissionTime, tol_local, dataType, ParmConfIntvl)
 
     if (length(results[["FailedModels"]][["MLE"]]) > 0){
->>>>>>> develop_for_FC
       dataType <- "FC"
       if(DataRange[1] == 1) {
           OffsetTime <- 0

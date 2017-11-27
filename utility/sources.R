@@ -41,12 +41,8 @@ source("trend_tests/Laplace_trend_test.R")
 
 source("utility/plots/Plot_Raw_Data.R")
 source("utility/plots/Plot_Trend_Tests.R")
-<<<<<<< HEAD
-source("utility/plots/PlotModelResults.R")
-=======
 debugSource("utility/plots/PlotModelResults.R")
 source("utility/plots/PlotModelEvals.R")
->>>>>>> develop_for_FC
 source("utility/plots/PlotModelPredictionResults.R")
 
 # Data utility functions
@@ -54,12 +50,6 @@ sys.source("utility/data/Data_Tools.R")
 
 # Tables utility functions
 source("utility/tables/DataAndTrendTables.R")
-<<<<<<< HEAD
-source("utility/tables/ModelResultTable.R")
-
-# Other utilities
-source("utility/RunModels.R")      # Models run flow
-=======
 debugSource("utility/tables/ModelResultTable.R")
 source("utility/tables/ModelEvalTable.R")
 
@@ -67,5 +57,4 @@ source("utility/tables/ModelEvalTable.R")
 # Other utilities
 debugSource("utility/RunModels.R")      # Models run flow
 debugSource("utility/RunModelEvals.R") # Models applicability evaluations flow
->>>>>>> develop_for_FC
 source("utility/ErrorMessages.R")

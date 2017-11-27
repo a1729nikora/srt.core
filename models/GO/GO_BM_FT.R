@@ -72,11 +72,6 @@ GO_BM_FT_MLE <- function(x){
     sol
 }
 
-<<<<<<< HEAD
-GO_FT_lnL <- function(params, x){
-  n <- length(x)
-  tn <- x[n]
-=======
 GO_FT_Preq_lnL <- function(parm_frame, fail_data){
   # Prequential likelihood function
   # Returns vector of -ln(prequential likelihood)
@@ -121,7 +116,6 @@ GO_FT_lnL <- function(params,paramNames,negLnL,failData){
   names(params)<-paramNames
   n <- length(failData)
   tn <- failData[n]
->>>>>>> develop_for_FC
   firstSumTerm <- 0
   for(i in 1:n){
     firstSumTerm = firstSumTerm + (-params$GO_bMLE*x[i])

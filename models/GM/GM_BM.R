@@ -166,11 +166,6 @@ GM_R <- function(param,d){
   
 }
 
-<<<<<<< HEAD
-
-GM_lnL <-  function(x,params){
-
-=======
 GM_FT_Preq_lnL <- function(parm_frame, fail_data){
   # Prequential likelihood function
   # Returns vector of -ln(prequential likelihood)
@@ -217,7 +212,6 @@ GM_FT_Bias_Trend <- function(parm_frame, fail_data){
 
 GM_FT_lnL<-function(params,paramNames,negLnL,failData){
   
->>>>>>> develop_for_FC
   sum1=0
   sum2=0
   #print(params)

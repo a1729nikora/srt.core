@@ -330,9 +330,6 @@ JM_MVF_r <- function(param,d){
 }
 
 
-<<<<<<< HEAD
-JM_lnL <- function(x,params){
-=======
 JM_FT_Preq_lnL <- function(parm_frame, fail_data){
   # Prequential likelihood function
   # Returns vector of -ln(prequential likelihood)
@@ -380,7 +377,6 @@ JM_FT_Bias_Trend <- function(parm_frame, fail_data){
 
 
 JM_FT_lnL <- function(params,paramNames,negLnL,failData){
->>>>>>> develop_for_FC
   #----------------------------------------------------------------------------
   # This computes Log-Likelihood for a given data x and parameters
   #----------------------------------------------------------------------------
