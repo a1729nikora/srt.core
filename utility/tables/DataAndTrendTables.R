@@ -33,7 +33,7 @@ data_or_trend_table <- function(fail_data_in, DataRange, DataOrTrend, TrendTest)
       # if the intervals are of unequal length, we use the times between
       # failures version of the data even if the original version is
       # failure counts.
-
+      
       in_data <- in_data$FRate
       
       DataColNames <- names(in_data)
@@ -87,14 +87,14 @@ data_or_trend_table <- function(fail_data_in, DataRange, DataOrTrend, TrendTest)
     
     DataColNames <- names(in_data)
     names(in_data) <- gsub("x.", "", DataColNames)
-
+    
     IF <- tail(head(in_data$IF, DataIntervalEnd), (DataIntervalEnd-DataIntervalStart+1))
     FT <- tail(head(in_data$FT, DataIntervalEnd), (DataIntervalEnd-DataIntervalStart+1))
     FN <- tail(head(in_data$FN, DataIntervalEnd), (DataIntervalEnd-DataIntervalStart+1))
     
     if (DataOrTrend == 1) {
       # Create failure data table
-
+      
       D_or_T_table <- data.frame("Failure Number"=FN, "Times Between Failures"=IF, "Failure Time"=FT)
     } else if (DataOrTrend == 2) {
       # Create trend test table
@@ -133,7 +133,7 @@ data_or_trend_table <- function(fail_data_in, DataRange, DataOrTrend, TrendTest)
     
     TableCreateError <- TRUE
   } # Endif - working with failure counts or failure times?
-
+  
   if (TableCreateError) {
     
     # If we've encountered any errors in creating the table,

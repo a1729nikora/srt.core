@@ -14,12 +14,12 @@ plot_model_results <- function(ModResults, ModelsThatRan, Data_Modeled, DataSetN
   RelMissionTime <- input$modelRelMissionTime
   AdditionalCurveLength <- input$modelCurveAdditionalTime
   PlotFault <- FALSE
-
+  
   PlotModelEstim <- NULL
   PlotModelEstim[["Low"]] <- input$LowConfOnRsltPlot
   PlotModelEstim[["MLE"]] <- input$MLEOnRsltPlot
   PlotModelEstim[["High"]] <- input$HighConfOnRsltPlot
-
+  
   # Suffix text that will be appended to the names of model result values
   # and parameter names in the table of model results.
   

@@ -22,10 +22,10 @@ plot_trend_tests <- function(fail_data_in, convertedFCData, DataName, DataRange,
     DataIntervalStart <- DataRange[1]
     DataIntervalEnd <- DataRange[2]
   }
-
+  
   # Initialize the plot.
   
-  localDataPlot <- ggplot()
+  localTrendPlot <- ggplot()
   
   if((DataIntervalEnd - DataIntervalStart + 1) >= MinIntervalWidth) {
     localTrendPlot <- ggplot(,aes_string(x="index",y="trend_test_statistic"))

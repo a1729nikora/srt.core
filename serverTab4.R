@@ -15,7 +15,7 @@
       last_row <- length(ModelResults[,1]) - PredAheadSteps
       model_params_label <- paste(model,"params",sep="_")
       model_params <- as.data.frame(matrix(0, ncol=length(get(model_params_label)), nrow = 1))
-
+ 
       #Generating model_params from ModelResults. If the column is a list, it is converted to numeric
       
       parmNames <- c()
@@ -38,7 +38,7 @@
         } else if ("IF" %in% get(paste(model,"input",sep="_"))){
             
             max_lnL <- try(get(paste(model,"FT","lnL",sep="_"))(model_params, parmNames,FALSE,data_global()$FRate$IF),silent=FALSE)
-            
+          
         } else {
             print("NOTHING found!")
         }
@@ -201,7 +201,7 @@
 ###############################################################################
 #Tab4 Plot Section
 ###############################################################################
-
+  
   # A reactive data item that is used to control the height of the model evals
   # plot.  The height is computed based on the width - it the plot is not as high
   # as it is wide, and if the width exceeds a minimum, then the height catches up with
@@ -254,7 +254,7 @@
     MEPlot
   }, height=MP_height)
   
-
+  
 ###############################################################################
 #Tab4 Evaluation Detail Table Section
 ###############################################################################
@@ -264,7 +264,7 @@
 # --------------------------------   TAB4 Evaluations Detail Table   -----------------------------------
 # ------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------
-
+  
   
   output$mytable3 <- DT::renderDataTable({
     ModelEvalTypes <- c("-lnPL", "PL Ratio", "Bias", "Bias Trend")
@@ -292,3 +292,4 @@
     ME_Table
   }, filter="top", options = list(scrollX=TRUE, lengthMenu = list(c(10, 25, 50, -1), c('10', '25', '50', 'All'))))
     
+  

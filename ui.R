@@ -505,19 +505,19 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                                                  min = 0.1, max = 1.0, step = 0.001,
                                                                  value = .90)
                                              ),
-                                             
-                                            column(12, 
+
+                                             column(12, 
                                                     radioButtons("ModelEvalPlotType", label = h6("Draw the plot with data points and lines, points only, or lines only?"),
                                                                  choices = list("Both" = "points_and_lines", "Points" = "points", "Lines" = "lines"), inline = TRUE,
                                                                  selected = "points_and_lines")
-                                             ),
-
-                                            column(12, 
-                                                     radioButtons("saveModelEvalsType", label = h6("Choose the type of file to save plots.  The Model Evaluation Table is saved as a CSV file."),
-                                                                  choices = list("JPEG" = "JPG", "PDF" = "PDF", "PNG" = "PNG", "TIFF" = "TIFF"), inline = TRUE,
-                                                                  selected = "JPG")
-                                             ),
-  
+                                              ),
+                                            
+                                             column(12, 
+                                                    radioButtons("saveModelEvalsType", label = h6("Choose the type of file to save plots.  The Model Evaluation Table is saved as a CSV file."),
+                                                                 choices = list("JPEG" = "JPG", "PDF" = "PDF", "PNG" = "PNG", "TIFF" = "TIFF"), inline = TRUE,
+                                                                 selected = "JPG")
+                                              ),
+                                            
                                              column(12, 
                                                     radioButtons("saveModelEvalSummaryType", label = h6("Save the model evaluation summary as PDF or CSV?"),
                                                                  choices = list("CSV" = "CSV", "PDF" = "PDF"), inline = TRUE,
@@ -630,10 +630,10 @@ shinyUI(navbarPage("Software Failure Risk Assessment Tool",
                                   tabPanel("Model Evaluation Plot",
                                            fluidRow (
                                              column(12,
-                                               selectInput(
-                                                 "EvalToPlot", label = h6("Choose a model applicability evaluation to plot."), 
-                                                 choices=list("No model evaluations to plot"="None"),
-                                                 multiple=FALSE, selected="None") 
+                                                selectInput(
+                                                  "EvalToPlot", label = h6("Choose a model applicability evaluation to plot."), 
+                                                  choices=list("No model evaluations to plot"="None"),
+                                                  multiple=FALSE, selected="None") 
                                              )
                                            ),
                                            fluidRow (

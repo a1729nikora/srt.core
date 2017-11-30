@@ -17,6 +17,7 @@ plot_model_prediction_results <- function(modelchoicelist,ModelsThatRan,plotType
   # print(modelchoicelist)
   # if(is.null(modelchoicelist)){
   #print("___printing model choice list")
+  #print(modelchoicelist)
   for (model in modelchoicelist){
     for(SuffixTag in ConfIntSuffixes) {
       if(any(ModelsThatRan[[SuffixTag]] == model)) {
@@ -50,7 +51,7 @@ plot_model_prediction_results <- function(modelchoicelist,ModelsThatRan,plotType
       }
     }
   }
-  
+    
   #print(prediction)
   if(plotType == "points_and_lines"){
       localResultsPlot <- localResultsPlot + geom_point(data=predictionPlotdataframe,aes(time,cost,color=Model)) + geom_step(data=predictionPlotdataframe,aes(time,cost,color=Model))

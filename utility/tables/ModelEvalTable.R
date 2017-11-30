@@ -39,7 +39,7 @@ model_eval_table <- function (in_data, ModelsForTable, input) {
     ME_Table_Error <- TRUE
     
   }
-
+  
   if(ME_Table_Error) {
     local_ME_Table <- data.frame()
   }

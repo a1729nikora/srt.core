@@ -6,13 +6,13 @@ plot_failure_data <- function(fail_data_in, convertedFCData, DataName, DataRange
   
   DataIntervalStart <- DataRange[1]
   DataIntervalEnd <- DataRange[2]
-
+  
   if('FCount' %in% names(fail_data_in)){
     in_data <- fail_data_in$FCount
   } else if('FRate' %in% names(fail_data_in)){
     in_data <- fail_data_in$FRate
   }
-
+  
   # Initialize the plot.
   
   localDataPlot <- ggplot()
@@ -75,7 +75,7 @@ plot_failure_data <- function(fail_data_in, convertedFCData, DataName, DataRange
       #FC <- c(unlist(subset(subset(in_data, in_data$TI >= DataIntervalStart, select = c(T, FC, CFC)), TI <= DataIntervalEnd, select = FC)), use.names=FALSE)
       #CFC <- c(unlist(subset(subset(in_data, in_data$TI >= DataIntervalStart, select = c(T, FC, CFC)), TI <= DataIntervalEnd, select = CFC)), use.names=FALSE)
       #CumT <- c(unlist(subset(subset(in_data, in_data$TI >= DataIntervalStart, select = c(T, FC, CFC)), TI <= DataIntervalEnd, select = T)), use.names=FALSE)
-
+      
       #FT <- c(unlist(subset(subset(convertedFCData, convertedFCData$FC_TI >= DataIntervalStart, select = c(FC_FN, FC_TI, FC_IF, FC_FT)), FC_TI <= DataIntervalEnd, select = FC_FT)), use.names=FALSE)
       #IF <- c(unlist(subset(subset(convertedFCData, convertedFCData$FC_TI >= DataIntervalStart, select = c(FC_FN, FC_TI, FC_IF, FC_FT)), FC_TI <= DataIntervalEnd, select = FC_IF)), use.names=FALSE)
       
@@ -124,7 +124,7 @@ plot_failure_data <- function(fail_data_in, convertedFCData, DataName, DataRange
       
     }
     
-     else {
+    else {
       # Couldn't determine whether we're working with IF or FC data.
       # #print an error message.
       

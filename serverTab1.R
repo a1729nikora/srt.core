@@ -208,7 +208,7 @@ getFileType <- function(inFile){
         if(length(names(data)) >= 1) {
             #Time <- names(data[1]) # generic name of column name of data frame (x-axis)
             #Failure <- names(data[2]) # (y-axis)
-            
+          
             data_set <- input$dataSheetChoice
             if(input$PlotDataOrTrend == 1){
             

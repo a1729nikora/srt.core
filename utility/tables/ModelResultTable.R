@@ -7,7 +7,7 @@ model_result_table <- function (in_data, NumObservations, input, ResultsToShow, 
   TableModelEstim[["Low"]] <- input$LowConfOnTable
   TableModelEstim[["MLE"]] <- input$MLEOnTable
   TableModelEstim[["High"]] <- input$HighConfOnTable
-
+  
   # First column holds failure numbers.
   local_MR_Table <- data.frame("Failure"=in_data$Failure)
   
