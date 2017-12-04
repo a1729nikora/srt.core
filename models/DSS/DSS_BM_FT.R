@@ -100,8 +100,13 @@ DSS_MVF_inv <- function(param,d){
   n <- length(d$FN)
   r <- data.frame()
   for(i in 1:n){
-    lowerBound <- -(log((param$DSS_aMLE-d$FN[i])/param$DSS_aMLE))/param$DSS_bMLE
-    upperBound <- lowerBound*10
+    if (((param$DSS_aMLE-d$FN[i])/param$DSS_aMLE) > 0) {
+      lowerBound <- -(log((param$DSS_aMLE-d$FN[i])/param$DSS_aMLE))/param$DSS_bMLE
+      upperBound <- lowerBound*10
+    } else {
+      lowerBound <- 0
+      upperBound <- 1.0
+    }
     sol <- tryCatch(
       stats::uniroot(f,lower=lowerBound, upper=upperBound, extendInt="yes", maxiter=maxiter, tol=1e-10, numFails=d$FN[i])$root,
       warning = function(w){
