@@ -9,9 +9,11 @@
   # ------------------------------------------------------------------------------------------------------
 
 
-  tab4_table1_construct <- function(model,data,input){
+  tab4_table1_construct <- function(model,data,model_evals,input){
     if(dataType(names(data))=="FR"){
       #model_params <- try(get(paste(model,get(paste(model,"methods",sep="_"))[1],"MLE",sep="_"))(get(paste("data"))[[get(paste(model,"input",sep="_"))]]),silent=TRUE)
+      ModelEvalTypes <- c("-lnPL", "PL Ratio", "Bias", "Bias Trend")
+      
       last_row <- length(ModelResults[,1]) - PredAheadSteps
       model_params_label <- paste(model,"params",sep="_")
       model_params <- as.data.frame(matrix(0, ncol=length(get(model_params_label)), nrow = 1))
@@ -75,8 +77,8 @@
           tab4_table1[count,1]<<- get(paste0(model, "_fullname"))
           tab4_table1[count,2]<<- AIC
           tab4_table1[count,3]<<- PSSE
-          tab4_table1[count,4]<<- 0
-          tab4_table1[count,5]<<- 0
+          tab4_table1[count,4]<<- as.character(model_evals[[paste(model, ModelEvalTypes[1], sep="_")]][length(model_evals[,1])])
+          tab4_table1[count,5]<<- as.character(model_evals[[paste(model, ModelEvalTypes[2], sep="_")]][length(model_evals[,1])])
           tab4_table1[count,6]<<- 0
           tab4_table1[count,7]<<- 0
         }
@@ -207,7 +209,7 @@
           count <<- 0
           
           for(i in ModelsToEval){
-            tab4_table1_construct(i,in_data_tab4,input)
+            tab4_table1_construct(i,in_data_tab4,ModelEvalsFrame,input)
           }
 
         tab4_table1 <<- data.frame(tab4_table1[1],tab4_table1[2],tab4_table1[3], tab4_table1[4], tab4_table1[5], tab4_table1[6], tab4_table1[7])
