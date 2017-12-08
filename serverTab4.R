@@ -50,12 +50,20 @@
           tab4_table1[count,1] <<- get(paste0(model, "_fullname"))
           tab4_table1[count,2] <<- "Given model lnL not defined to compute AIC"
           tab4_table1[count,3] <<- "Given model lnL not defined to compute AIC" 
+          tab4_table1[count,4] <<- "Given model unable to compute prequential likelihood" 
+          tab4_table1[count,5] <<- "Given model unable to compute PL ratio" 
+          tab4_table1[count,6] <<- "Given model unable to compute model bias" 
+          tab4_table1[count,7] <<- "Given model unable to computebias trend" 
         }
         else if(typeof(max_lnL)!='double') {
           count<<-count+1
           tab4_table1[count,1] <<- get(paste0(model, "_fullname"))
           tab4_table1[count,2] <<- "Non numeral value. Something is not right"
           tab4_table1[count,3] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,4] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,5] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,6] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,7] <<- "Non numeral value. Something is not right" 
         }
         else {
             #print(paste0("Length of model_params = ", length(get(paste(model,"params",sep="_")))))
@@ -67,6 +75,10 @@
           tab4_table1[count,1]<<- get(paste0(model, "_fullname"))
           tab4_table1[count,2]<<- AIC
           tab4_table1[count,3]<<- PSSE
+          tab4_table1[count,4]<<- 0
+          tab4_table1[count,5]<<- 0
+          tab4_table1[count,6]<<- 0
+          tab4_table1[count,7]<<- 0
         }
       }
       else if(typeof(model_params)=="character"){
@@ -75,12 +87,20 @@
           tab4_table1[count,1] <<- model
           tab4_table1[count,2] <<- "Given-model not defined"
           tab4_table1[count,3] <<- "Given-model not defined" 
+          tab4_table1[count,4] <<- "Given-model not defined" 
+          tab4_table1[count,5] <<- "Given-model not defined" 
+          tab4_table1[count,6] <<- "Given-model not defined" 
+          tab4_table1[count,7] <<- "Given-model not defined" 
         }
         else {
           count<<-count + 1
           tab4_table1[count,1] <<- get(paste0(model, "_fullname"))
           tab4_table1[count,2] <<- "NON-CONV"
           tab4_table1[count,3] <<- "NON-CONV"
+          tab4_table1[count,4] <<- "NON-CONV"
+          tab4_table1[count,5] <<- "NON-CONV"
+          tab4_table1[count,6] <<- "NON-CONV"
+          tab4_table1[count,7] <<- "NON-CONV"
         }
       }
     }
@@ -104,7 +124,7 @@
         # Save model results table.
         
         paste(paste0(data_set_name, "_Model_Evals"), "csv", sep=".")
-      } else if (input$ModelEvaluationTabset == "Evaluation Summary") {
+      } else if (input$ModelEvaluationTabset == "Model Evaluation Summary") {
         
         # Save model evaluation summary.
         
@@ -118,7 +138,7 @@
     content = function(filespec) {
       if(input$ModelEvaluationTabset == "Model Evaluation Plot") {
         ggsave(filespec, plot=MEPlot, width=20,height=15)
-      } else if (input$ModelEvaluationTabset == "Evaluation Summary") {
+      } else if (input$ModelEvaluationTabset == "Model Evaluation Summary") {
         tab4_table1_2_save <- tab4_table1
         
         # Turn OutputTable to character representations to avoid
@@ -128,7 +148,7 @@
         for (nameIndex in TableNames) {
           tab4_table1_2_save[[nameIndex]] <- as.character(tab4_table1_2_save[[nameIndex]])
         }
-        names(tab4_table1_2_save) <- c("Model", "AIC", "PSSE")
+        names(tab4_table1_2_save) <- c("Model","AIC","PSSE", "'-lnPL", "PL Ratio", "Bias", "Bias Trend")
         
         if(length(tab4_table1_2_save) <= 1) {
           tab4_table1_2_save <- data.frame()
@@ -190,8 +210,8 @@
             tab4_table1_construct(i,in_data_tab4,input)
           }
 
-        tab4_table1 <<- data.frame(tab4_table1[1],tab4_table1[2],tab4_table1[3])
-        names(tab4_table1) <<- c("Model","AIC","PSSE")
+        tab4_table1 <<- data.frame(tab4_table1[1],tab4_table1[2],tab4_table1[3], tab4_table1[4], tab4_table1[5], tab4_table1[6], tab4_table1[7])
+        names(tab4_table1) <<- c("Model","AIC","PSSE", "-lnPL", "PL Ratio", "Bias", "Bias Trend")
       }
       tab4_table1 = round_table(tab4_table1, 6)
 
