@@ -43,7 +43,7 @@ shinyServer(function(input, output, clientData, session) {#reactive shiny functi
 
   K_minDataModelIntervalWidth <- 5
   K_CategoryFirst <- 1
-  K_CategoryLast <- 5
+  K_CategoryLast <- K_minDataModelIntervalWidth
 
   # These lists identify the models used for each data type
 

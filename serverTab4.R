@@ -9,9 +9,11 @@
   # ------------------------------------------------------------------------------------------------------
 
 
-  tab4_table1_construct <- function(model,data,input){
+  tab4_table1_construct <- function(model,data,model_evals,input){
     if(dataType(names(data))=="FR"){
       #model_params <- try(get(paste(model,get(paste(model,"methods",sep="_"))[1],"MLE",sep="_"))(get(paste("data"))[[get(paste(model,"input",sep="_"))]]),silent=TRUE)
+      ModelEvalTypes <- c("PSSE", "GOF", "GOF p-value", "Model Fit?", "AIC", "AIC Ratio", "-lnPL", "PL Ratio", "Bias", "Bias p-value", "Bias?", "Bias Trend", "Bias Trend p-value", "Bias Trend?")
+      
       last_row <- length(ModelResults[,1]) - PredAheadSteps
       model_params_label <- paste(model,"params",sep="_")
       model_params <- as.data.frame(matrix(0, ncol=length(get(model_params_label)), nrow = 1))
@@ -48,14 +50,38 @@
         if(length(grep("not found",max_lnL))) {
           count<<-count+1
           tab4_table1[count,1] <<- get(paste0(model, "_fullname"))
-          tab4_table1[count,2] <<- "Given model lnL not defined to compute AIC"
-          tab4_table1[count,3] <<- "Given model lnL not defined to compute AIC" 
+          tab4_table1[count,2] <<- "Given model lnL not defined to compute PSSE"
+          tab4_table1[count,3] <<- "Given model lnL not defined to compute GOF Test"
+          tab4_table1[count,4] <<- "Given model lnL not defined to compute GOF p-value"
+          tab4_table1[count,5] <<- "Given model lnL not defined to determine whether model fits"
+          tab4_table1[count,6] <<- "Given model lnL not defined to compute AIC" 
+          tab4_table1[count,7] <<- "Given model lnL not defined to compute AIC ratio" 
+          tab4_table1[count,8] <<- "Given model unable to compute prequential likelihood" 
+          tab4_table1[count,9] <<- "Given model unable to compute PL ratio" 
+          tab4_table1[count,10] <<- "Given model unable to compute model bias statistic" 
+          tab4_table1[count,11] <<- "Given model unable to compute model bias p-value" 
+          tab4_table1[count,12] <<- "Given model unable to determine whether model exhibits bias" 
+          tab4_table1[count,13] <<- "Given model unable to compute model bias trend statistic" 
+          tab4_table1[count,14] <<- "Given model unable to compute model bias trend p-value" 
+          tab4_table1[count,15] <<- "Given model unable to determine whether model exhibits bias trend" 
         }
         else if(typeof(max_lnL)!='double') {
           count<<-count+1
           tab4_table1[count,1] <<- get(paste0(model, "_fullname"))
           tab4_table1[count,2] <<- "Non numeral value. Something is not right"
           tab4_table1[count,3] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,4] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,5] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,6] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,7] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,8] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,9] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,10] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,11] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,12] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,13] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,14] <<- "Non numeral value. Something is not right" 
+          tab4_table1[count,15] <<- "Non numeral value. Something is not right" 
         }
         else {
             #print(paste0("Length of model_params = ", length(get(paste(model,"params",sep="_")))))
@@ -65,8 +91,38 @@
           PSSE <- psse(model,data_global()$FRate$FT,model_params,input$percentData)
           count <<- count+1
           tab4_table1[count,1]<<- get(paste0(model, "_fullname"))
-          tab4_table1[count,2]<<- AIC
-          tab4_table1[count,3]<<- PSSE
+          tab4_table1[count,2]<<- PSSE
+          tab4_table1[count,3]<<- 0     # GOF
+          tab4_table1[count,4]<<- 0     # GOF value
+          tab4_table1[count,5]<<- 0     # Model fits at selected significance level? (Y/N)
+          tab4_table1[count,6]<<- AIC
+          tab4_table1[count,7]<<- 0     # AIC ratio
+          tab4_table1[count,8]<<- as.character(model_evals[[paste(model, ModelEvalTypes[7], sep="_")]][length(model_evals[,1])])
+          tab4_table1[count,9]<<- as.character(model_evals[[paste(model, ModelEvalTypes[8], sep="_")]][length(model_evals[,1])])
+          
+          biasArray <- model_evals[[paste(model, ModelEvalTypes[9], sep="_")]]
+          if (all(is.numeric(biasArray)) && all(is.finite(biasArray)) && !anyNA(biasArray)) {
+            biasValue <- ks.test(biasArray, punif)
+            tab4_table1[count,10]<<- biasValue$statistic    # Model bias statistic
+            tab4_table1[count,11]<<- biasValue$p.value    # Model bias p-value
+            tab4_table1[count,12]<<- 0    # Model bias at selected significance level? (Y/N)
+          } else {
+            tab4_table1[count,10]<<- NA
+            tab4_table1[count,11]<<- NA
+            tab4_table1[count,12]<<- NA
+          }
+          
+          trendArray <- model_evals[[paste(model, ModelEvalTypes[12], sep="_")]]
+          if (all(is.numeric(trendArray)) && all(is.finite(trendArray)) && !anyNA(trendArray)) {
+            trendValue <- ks.test(biasArray, punif)
+            tab4_table1[count,13]<<- trendValue$statistic    # Model bias trend statistic
+            tab4_table1[count,14]<<- trendValue$p.value    # Model bias trend p-value
+            tab4_table1[count,15]<<- 0    # Model bias trend at selected significance level? (Y/N)
+          } else {
+            tab4_table1[count,13]<<- NA
+            tab4_table1[count,14]<<- NA
+            tab4_table1[count,15]<<- NA
+          }
         }
       }
       else if(typeof(model_params)=="character"){
@@ -75,12 +131,36 @@
           tab4_table1[count,1] <<- model
           tab4_table1[count,2] <<- "Given-model not defined"
           tab4_table1[count,3] <<- "Given-model not defined" 
+          tab4_table1[count,4] <<- "Given-model not defined" 
+          tab4_table1[count,5] <<- "Given-model not defined" 
+          tab4_table1[count,6] <<- "Given-model not defined" 
+          tab4_table1[count,7] <<- "Given-model not defined" 
+          tab4_table1[count,8] <<- "Given-model not defined" 
+          tab4_table1[count,9] <<- "Given-model not defined" 
+          tab4_table1[count,10] <<- "Given-model not defined" 
+          tab4_table1[count,11] <<- "Given-model not defined" 
+          tab4_table1[count,12] <<- "Given-model not defined" 
+          tab4_table1[count,13] <<- "Given-model not defined" 
+          tab4_table1[count,14] <<- "Given-model not defined" 
+          tab4_table1[count,15] <<- "Given-model not defined" 
         }
         else {
           count<<-count + 1
           tab4_table1[count,1] <<- get(paste0(model, "_fullname"))
           tab4_table1[count,2] <<- "NON-CONV"
           tab4_table1[count,3] <<- "NON-CONV"
+          tab4_table1[count,4] <<- "NON-CONV"
+          tab4_table1[count,5] <<- "NON-CONV"
+          tab4_table1[count,6] <<- "NON-CONV"
+          tab4_table1[count,7] <<- "NON-CONV"
+          tab4_table1[count,8] <<- "NON-CONV"
+          tab4_table1[count,9] <<- "NON-CONV"
+          tab4_table1[count,10] <<- "NON-CONV"
+          tab4_table1[count,11] <<- "NON-CONV"
+          tab4_table1[count,12] <<- "NON-CONV"
+          tab4_table1[count,13] <<- "NON-CONV"
+          tab4_table1[count,14] <<- "NON-CONV"
+          tab4_table1[count,15] <<- "NON-CONV"
         }
       }
     }
@@ -104,7 +184,7 @@
         # Save model results table.
         
         paste(paste0(data_set_name, "_Model_Evals"), "csv", sep=".")
-      } else if (input$ModelEvaluationTabset == "Evaluation Summary") {
+      } else if (input$ModelEvaluationTabset == "Model Evaluation Summary") {
         
         # Save model evaluation summary.
         
@@ -118,7 +198,7 @@
     content = function(filespec) {
       if(input$ModelEvaluationTabset == "Model Evaluation Plot") {
         ggsave(filespec, plot=MEPlot, width=20,height=15)
-      } else if (input$ModelEvaluationTabset == "Evaluation Summary") {
+      } else if (input$ModelEvaluationTabset == "Model Evaluation Summary") {
         tab4_table1_2_save <- tab4_table1
         
         # Turn OutputTable to character representations to avoid
@@ -128,7 +208,7 @@
         for (nameIndex in TableNames) {
           tab4_table1_2_save[[nameIndex]] <- as.character(tab4_table1_2_save[[nameIndex]])
         }
-        names(tab4_table1_2_save) <- c("Model", "AIC", "PSSE")
+        names(tab4_table1_2_save) <- c("Model","PSSE", "GOF", "GOF p-value", "Model Fit?", "AIC", "AIC Ratio", "'-lnPL", "PL Ratio", "Bias", "Bias p-value", "Bias?", "Bias Trend", "Bias Trend p-value", "Bias Trend?")
         
         if(length(tab4_table1_2_save) <= 1) {
           tab4_table1_2_save <- data.frame()
@@ -187,11 +267,11 @@
           count <<- 0
           
           for(i in ModelsToEval){
-            tab4_table1_construct(i,in_data_tab4,input)
+            tab4_table1_construct(i,in_data_tab4,ModelEvalsFrame,input)
           }
 
-        tab4_table1 <<- data.frame(tab4_table1[1],tab4_table1[2],tab4_table1[3])
-        names(tab4_table1) <<- c("Model","AIC","PSSE")
+        tab4_table1 <<- data.frame(tab4_table1[1],tab4_table1[2],tab4_table1[3], tab4_table1[4], tab4_table1[5], tab4_table1[6], tab4_table1[7], tab4_table1[8], tab4_table1[9], tab4_table1[10], tab4_table1[11], tab4_table1[12], tab4_table1[13], tab4_table1[14], tab4_table1[15])
+        names(tab4_table1) <<- c("Model","PSSE", "GOF", "GOF p-value", "Model Fit?", "AIC", "AIC Ratio", "-lnPL", "PL Ratio", "Bias", "Bias p-value", "Bias?", "Bias Trend", "Bias Trend p-value", "Bias Trend?")
       }
       tab4_table1 = round_table(tab4_table1, 6)
 
