@@ -99,12 +99,30 @@
           tab4_table1[count,7]<<- 0     # AIC ratio
           tab4_table1[count,8]<<- as.character(model_evals[[paste(model, ModelEvalTypes[7], sep="_")]][length(model_evals[,1])])
           tab4_table1[count,9]<<- as.character(model_evals[[paste(model, ModelEvalTypes[8], sep="_")]][length(model_evals[,1])])
-          tab4_table1[count,10]<<- 0    # Model bias statistic
-          tab4_table1[count,11]<<- 0    # Model bias p-value
-          tab4_table1[count,12]<<- 0    # Model bias at selected significance level? (Y/N)
-          tab4_table1[count,13]<<- 0    # Model bias trend statistic
-          tab4_table1[count,14]<<- 0    # Model bias trend p-value
-          tab4_table1[count,15]<<- 0    # Model bias trend at selected significance level? (Y/N)
+          
+          biasArray <- model_evals[[paste(model, ModelEvalTypes[9], sep="_")]]
+          if (all(is.numeric(biasArray)) && all(is.finite(biasArray)) && !anyNA(biasArray)) {
+            biasValue <- ks.test(biasArray, punif)
+            tab4_table1[count,10]<<- biasValue$statistic    # Model bias statistic
+            tab4_table1[count,11]<<- biasValue$p.value    # Model bias p-value
+            tab4_table1[count,12]<<- 0    # Model bias at selected significance level? (Y/N)
+          } else {
+            tab4_table1[count,10]<<- NA
+            tab4_table1[count,11]<<- NA
+            tab4_table1[count,12]<<- NA
+          }
+          
+          trendArray <- model_evals[[paste(model, ModelEvalTypes[12], sep="_")]]
+          if (all(is.numeric(trendArray)) && all(is.finite(trendArray)) && !anyNA(trendArray)) {
+            trendValue <- ks.test(biasArray, punif)
+            tab4_table1[count,13]<<- trendValue$statistic    # Model bias trend statistic
+            tab4_table1[count,14]<<- trendValue$p.value    # Model bias trend p-value
+            tab4_table1[count,15]<<- 0    # Model bias trend at selected significance level? (Y/N)
+          } else {
+            tab4_table1[count,13]<<- NA
+            tab4_table1[count,14]<<- NA
+            tab4_table1[count,15]<<- NA
+          }
         }
       }
       else if(typeof(model_params)=="character"){
