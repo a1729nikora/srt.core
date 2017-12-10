@@ -9,162 +9,189 @@
   # ------------------------------------------------------------------------------------------------------
 
 
-  tab4_table1_construct <- function(model,data,model_evals,input){
-    if(dataType(names(data))=="FR"){
-      #model_params <- try(get(paste(model,get(paste(model,"methods",sep="_"))[1],"MLE",sep="_"))(get(paste("data"))[[get(paste(model,"input",sep="_"))]]),silent=TRUE)
+  tab4_table1_construct <- function(models_to_eval,data,model_results,model_evals,input){
+    if(dataType(names(data))=="FR") {
       ModelEvalTypes <- c("PSSE", "GOF", "GOF p-value", "Model Fit?", "AIC", "AIC Ratio", "-lnPL", "PL Ratio", "Bias", "Bias p-value", "Bias?", "Bias Trend", "Bias Trend p-value", "Bias Trend?")
       
-      last_row <- length(ModelResults[,1]) - PredAheadSteps
-      model_params_label <- paste(model,"params",sep="_")
-      model_params <- as.data.frame(matrix(0, ncol=length(get(model_params_label)), nrow = 1))
-
-      #Generating model_params from ModelResults. If the column is a list, it is converted to numeric
+      minAIC <- Inf
+      arrayAIC <- c()
       
-      parmNames <- c()
-      for (paramNum in 1:length(get(model_params_label))) {
-        model_parm_num <- paste0(model, "_", get(model_params_label)[paramNum], "_MLE")
-        parmNames <- c(parmNames, model_parm_num)
-        model_params[1,paramNum] <- ModelResults[[model_parm_num]][last_row]
-      }
-      colnames(model_params) <- parmNames
-      
-      if(typeof(model_params)!="character"){
-        # number_fails <- get_prediction_n(model_params,input$modelDetailPredTime,length(get("data")[[get(paste(model,"input",sep="_"))]]))
-        #max_lnL <- try(get(paste(model,"lnL",sep="_"))(get("data")[[get(paste(model,"input",sep="_"))]],model_params),silent=TRUE)
+      for (modelName in models_to_eval) {
+        #model_params <- try(get(paste(modelName,get(paste(modelName,"methods",sep="_"))[1],"MLE",sep="_"))(get(paste("data"))[[get(paste(modelName,"input",sep="_"))]]),silent=TRUE)
+        last_row <- length(ModelResults[,1]) - PredAheadSteps
+        model_params_label <- paste(modelName,"params",sep="_")
+        model_params <- as.data.frame(matrix(0, ncol=length(get(model_params_label)), nrow = 1))
         
-        #print(data_global()$FRate['FT'])
-
-        if ("FT" %in% get(paste(model,"input",sep="_"))){
-            max_lnL <- try(get(paste(model,"FT","lnL",sep="_"))(model_params, parmNames,FALSE,data_global()$FRate$FT),silent=FALSE)
+        #Generating model_params from ModelResults. If the column is a list, it is converted to numeric
+        
+        parmNames <- c()
+        for (paramNum in 1:length(get(model_params_label))) {
+          model_parm_num <- paste0(modelName, "_", get(model_params_label)[paramNum], "_MLE")
+          parmNames <- c(parmNames, model_parm_num)
+          model_params[1,paramNum] <- ModelResults[[model_parm_num]][last_row]
+        }
+        colnames(model_params) <- parmNames
+        
+        if(typeof(model_params)!="character"){
+          # number_fails <- get_prediction_n(model_params,input$modelDetailPredTime,length(get("data")[[get(paste(modelName,"input",sep="_"))]]))
+          #max_lnL <- try(get(paste(modelName,"lnL",sep="_"))(get("data")[[get(paste(modelName,"input",sep="_"))]],model_params),silent=TRUE)
+          
+          #print(data_global()$FRate['FT'])
+          
+          if ("FT" %in% get(paste(modelName,"input",sep="_"))){
+            max_lnL <- try(get(paste(modelName,"FT","lnL",sep="_"))(model_params, parmNames,FALSE,data_global()$FRate$FT),silent=FALSE)
             
-        } else if ("IF" %in% get(paste(model,"input",sep="_"))){
+          } else if ("IF" %in% get(paste(modelName,"input",sep="_"))){
             
-            max_lnL <- try(get(paste(model,"FT","lnL",sep="_"))(model_params, parmNames,FALSE,data_global()$FRate$IF),silent=FALSE)
+            max_lnL <- try(get(paste(modelName,"FT","lnL",sep="_"))(model_params, parmNames,FALSE,data_global()$FRate$IF),silent=FALSE)
             
-        } else {
+          } else {
             print("NOTHING found!")
-        }
+          }
+          
+          # time_fails <- get_prediction_t(model_params, input$modelDetailPredFailures, length(get("data")[[get(paste(modelName,"input",sep="_"))]]))
+          
+          if(length(grep("not found",max_lnL))) {
+            count<<-count+1
+            arrayAIC <- c(arrayAIC, -1)
+            tab4_table1[count,1] <<- get(paste0(modelName, "_fullname"))
+            tab4_table1[count,2] <<- "Given model lnL not defined to compute PSSE"
+            tab4_table1[count,3] <<- "Given model lnL not defined to compute GOF Test"
+            tab4_table1[count,4] <<- "Given model lnL not defined to compute GOF p-value"
+            tab4_table1[count,5] <<- "Given model lnL not defined to determine whether model fits"
+            tab4_table1[count,6] <<- "Given model lnL not defined to compute AIC" 
+            tab4_table1[count,7] <<- "Given model lnL not defined to compute AIC ratio" 
+            tab4_table1[count,8] <<- "Given model unable to compute prequential likelihood" 
+            tab4_table1[count,9] <<- "Given model unable to compute PL ratio" 
+            tab4_table1[count,10] <<- "Given model unable to compute model bias statistic" 
+            tab4_table1[count,11] <<- "Given model unable to compute model bias p-value" 
+            tab4_table1[count,12] <<- "Given model unable to determine whether model exhibits bias" 
+            tab4_table1[count,13] <<- "Given model unable to compute model bias trend statistic" 
+            tab4_table1[count,14] <<- "Given model unable to compute model bias trend p-value" 
+            tab4_table1[count,15] <<- "Given model unable to determine whether model exhibits bias trend" 
+          }
+          else if(typeof(max_lnL)!='double') {
+            count<<-count+1
+            arrayAIC <- c(arrayAIC, -1)
+            tab4_table1[count,1] <<- get(paste0(modelName, "_fullname"))
+            tab4_table1[count,2] <<- "Non numeral value. Something is not right"
+            tab4_table1[count,3] <<- "Non numeral value. Something is not right" 
+            tab4_table1[count,4] <<- "Non numeral value. Something is not right" 
+            tab4_table1[count,5] <<- "Non numeral value. Something is not right" 
+            tab4_table1[count,6] <<- "Non numeral value. Something is not right" 
+            tab4_table1[count,7] <<- "Non numeral value. Something is not right" 
+            tab4_table1[count,8] <<- "Non numeral value. Something is not right" 
+            tab4_table1[count,9] <<- "Non numeral value. Something is not right" 
+            tab4_table1[count,10] <<- "Non numeral value. Something is not right" 
+            tab4_table1[count,11] <<- "Non numeral value. Something is not right" 
+            tab4_table1[count,12] <<- "Non numeral value. Something is not right" 
+            tab4_table1[count,13] <<- "Non numeral value. Something is not right" 
+            tab4_table1[count,14] <<- "Non numeral value. Something is not right" 
+            tab4_table1[count,15] <<- "Non numeral value. Something is not right" 
+          } else {
+            #print(paste0("Length of model_params = ", length(get(paste(modelName,"params",sep="_")))))
             
-        # time_fails <- get_prediction_t(model_params, input$modelDetailPredFailures, length(get("data")[[get(paste(model,"input",sep="_"))]]))
+            AIC <- aic(length(get(paste(modelName,"params",sep="_"))),max_lnL)
+            if (AIC < minAIC) {
+              minAIC <- AIC
+            }
+            arrayAIC <- c(arrayAIC, AIC)
+            
+            PSSE <- psse(modelName,data_global()$FRate$FT,model_params,input$percentData)
+            count <<- count+1
+            tab4_table1[count,1]<<- get(paste0(modelName, "_fullname"))
+            tab4_table1[count,2]<<- PSSE
+            IFsample1 <- data$FRate$IF
+            IFsample2 <- head(model_results[[paste(modelName, "IF", "MLE", sep="_")]], length(IFsample1))
+            if (all(is.numeric(IFsample1)) && all(is.finite(IFsample1)) && !anyNA(IFsample1) && all(is.numeric(IFsample2)) && all(is.finite(IFsample2)) && !anyNA(IFsample2)) {
+                GOFstat <- ks.test(IFsample1, IFsample2)
+                tab4_table1[count,3]<<- GOFstat$statistic     # GOF statistic
+                tab4_table1[count,4]<<- GOFstat$p.value     # GOF p-value
+                tab4_table1[count,5]<<- 0     # Model fits at selected significance level? (Y/N)
+            } else {
+              tab4_table1[count,3]<<- NA     # GOF statistic
+              tab4_table1[count,4]<<- NA     # GOF p-value
+              tab4_table1[count,5]<<- NA     # Model fits at selected significance level? (Y/N)
+            }
+            tab4_table1[count,6]<<- AIC
+            tab4_table1[count,7]<<- 0     # AIC ratio
+            tab4_table1[count,8]<<- as.character(model_evals[[paste(modelName, ModelEvalTypes[7], sep="_")]][length(model_evals[,1])])
+            tab4_table1[count,9]<<- as.character(model_evals[[paste(modelName, ModelEvalTypes[8], sep="_")]][length(model_evals[,1])])
+            
+            biasArray <- model_evals[[paste(modelName, ModelEvalTypes[9], sep="_")]]
+            if (all(is.numeric(biasArray)) && all(is.finite(biasArray)) && !anyNA(biasArray)) {
+              biasValue <- ks.test(biasArray, punif)
+              tab4_table1[count,10]<<- biasValue$statistic    # Model bias statistic
+              tab4_table1[count,11]<<- biasValue$p.value    # Model bias p-value
+              tab4_table1[count,12]<<- 0    # Model bias at selected significance level? (Y/N)
+            } else {
+              tab4_table1[count,10]<<- NA
+              tab4_table1[count,11]<<- NA
+              tab4_table1[count,12]<<- NA
+            }
+            
+            trendArray <- model_evals[[paste(modelName, ModelEvalTypes[12], sep="_")]]
+            if (all(is.numeric(trendArray)) && all(is.finite(trendArray)) && !anyNA(trendArray)) {
+              trendValue <- ks.test(biasArray, punif)
+              tab4_table1[count,13]<<- trendValue$statistic    # Model bias trend statistic
+              tab4_table1[count,14]<<- trendValue$p.value    # Model bias trend p-value
+              tab4_table1[count,15]<<- 0    # Model bias trend at selected significance level? (Y/N)
+            } else {
+              tab4_table1[count,13]<<- NA
+              tab4_table1[count,14]<<- NA
+              tab4_table1[count,15]<<- NA
+            }
+          }
+        } else if(typeof(model_params)=="character") {
+          if(length(grep("not found",model_params))) {
+            count<<-count+1
+            arrayAIC <- c(arrayAIC, -1)
+            tab4_table1[count,1] <<- modelName
+            tab4_table1[count,2] <<- "Given-model not defined"
+            tab4_table1[count,3] <<- "Given-model not defined" 
+            tab4_table1[count,4] <<- "Given-model not defined" 
+            tab4_table1[count,5] <<- "Given-model not defined" 
+            tab4_table1[count,6] <<- "Given-model not defined" 
+            tab4_table1[count,7] <<- "Given-model not defined" 
+            tab4_table1[count,8] <<- "Given-model not defined" 
+            tab4_table1[count,9] <<- "Given-model not defined" 
+            tab4_table1[count,10] <<- "Given-model not defined" 
+            tab4_table1[count,11] <<- "Given-model not defined" 
+            tab4_table1[count,12] <<- "Given-model not defined" 
+            tab4_table1[count,13] <<- "Given-model not defined" 
+            tab4_table1[count,14] <<- "Given-model not defined" 
+            tab4_table1[count,15] <<- "Given-model not defined" 
+          } else {
+            count<<-count + 1
+            arrayAIC <- c(arrayAIC, -1)
+            tab4_table1[count,1] <<- get(paste0(modelName, "_fullname"))
+            tab4_table1[count,2] <<- "NON-CONV"
+            tab4_table1[count,3] <<- "NON-CONV"
+            tab4_table1[count,4] <<- "NON-CONV"
+            tab4_table1[count,5] <<- "NON-CONV"
+            tab4_table1[count,6] <<- "NON-CONV"
+            tab4_table1[count,7] <<- "NON-CONV"
+            tab4_table1[count,8] <<- "NON-CONV"
+            tab4_table1[count,9] <<- "NON-CONV"
+            tab4_table1[count,10] <<- "NON-CONV"
+            tab4_table1[count,11] <<- "NON-CONV"
+            tab4_table1[count,12] <<- "NON-CONV"
+            tab4_table1[count,13] <<- "NON-CONV"
+            tab4_table1[count,14] <<- "NON-CONV"
+            tab4_table1[count,15] <<- "NON-CONV"
+          }
+        }
+      } # End for - compute evaluations for all models in models to eval list.
       
-        if(length(grep("not found",max_lnL))) {
-          count<<-count+1
-          tab4_table1[count,1] <<- get(paste0(model, "_fullname"))
-          tab4_table1[count,2] <<- "Given model lnL not defined to compute PSSE"
-          tab4_table1[count,3] <<- "Given model lnL not defined to compute GOF Test"
-          tab4_table1[count,4] <<- "Given model lnL not defined to compute GOF p-value"
-          tab4_table1[count,5] <<- "Given model lnL not defined to determine whether model fits"
-          tab4_table1[count,6] <<- "Given model lnL not defined to compute AIC" 
-          tab4_table1[count,7] <<- "Given model lnL not defined to compute AIC ratio" 
-          tab4_table1[count,8] <<- "Given model unable to compute prequential likelihood" 
-          tab4_table1[count,9] <<- "Given model unable to compute PL ratio" 
-          tab4_table1[count,10] <<- "Given model unable to compute model bias statistic" 
-          tab4_table1[count,11] <<- "Given model unable to compute model bias p-value" 
-          tab4_table1[count,12] <<- "Given model unable to determine whether model exhibits bias" 
-          tab4_table1[count,13] <<- "Given model unable to compute model bias trend statistic" 
-          tab4_table1[count,14] <<- "Given model unable to compute model bias trend p-value" 
-          tab4_table1[count,15] <<- "Given model unable to determine whether model exhibits bias trend" 
-        }
-        else if(typeof(max_lnL)!='double') {
-          count<<-count+1
-          tab4_table1[count,1] <<- get(paste0(model, "_fullname"))
-          tab4_table1[count,2] <<- "Non numeral value. Something is not right"
-          tab4_table1[count,3] <<- "Non numeral value. Something is not right" 
-          tab4_table1[count,4] <<- "Non numeral value. Something is not right" 
-          tab4_table1[count,5] <<- "Non numeral value. Something is not right" 
-          tab4_table1[count,6] <<- "Non numeral value. Something is not right" 
-          tab4_table1[count,7] <<- "Non numeral value. Something is not right" 
-          tab4_table1[count,8] <<- "Non numeral value. Something is not right" 
-          tab4_table1[count,9] <<- "Non numeral value. Something is not right" 
-          tab4_table1[count,10] <<- "Non numeral value. Something is not right" 
-          tab4_table1[count,11] <<- "Non numeral value. Something is not right" 
-          tab4_table1[count,12] <<- "Non numeral value. Something is not right" 
-          tab4_table1[count,13] <<- "Non numeral value. Something is not right" 
-          tab4_table1[count,14] <<- "Non numeral value. Something is not right" 
-          tab4_table1[count,15] <<- "Non numeral value. Something is not right" 
-        }
-        else {
-            #print(paste0("Length of model_params = ", length(get(paste(model,"params",sep="_")))))
-            
-          AIC <- aic(length(get(paste(model,"params",sep="_"))),max_lnL)
-          
-          PSSE <- psse(model,data_global()$FRate$FT,model_params,input$percentData)
-          count <<- count+1
-          tab4_table1[count,1]<<- get(paste0(model, "_fullname"))
-          tab4_table1[count,2]<<- PSSE
-          tab4_table1[count,3]<<- 0     # GOF
-          tab4_table1[count,4]<<- 0     # GOF value
-          tab4_table1[count,5]<<- 0     # Model fits at selected significance level? (Y/N)
-          tab4_table1[count,6]<<- AIC
-          tab4_table1[count,7]<<- 0     # AIC ratio
-          tab4_table1[count,8]<<- as.character(model_evals[[paste(model, ModelEvalTypes[7], sep="_")]][length(model_evals[,1])])
-          tab4_table1[count,9]<<- as.character(model_evals[[paste(model, ModelEvalTypes[8], sep="_")]][length(model_evals[,1])])
-          
-          biasArray <- model_evals[[paste(model, ModelEvalTypes[9], sep="_")]]
-          if (all(is.numeric(biasArray)) && all(is.finite(biasArray)) && !anyNA(biasArray)) {
-            biasValue <- ks.test(biasArray, punif)
-            tab4_table1[count,10]<<- biasValue$statistic    # Model bias statistic
-            tab4_table1[count,11]<<- biasValue$p.value    # Model bias p-value
-            tab4_table1[count,12]<<- 0    # Model bias at selected significance level? (Y/N)
-          } else {
-            tab4_table1[count,10]<<- NA
-            tab4_table1[count,11]<<- NA
-            tab4_table1[count,12]<<- NA
-          }
-          
-          trendArray <- model_evals[[paste(model, ModelEvalTypes[12], sep="_")]]
-          if (all(is.numeric(trendArray)) && all(is.finite(trendArray)) && !anyNA(trendArray)) {
-            trendValue <- ks.test(biasArray, punif)
-            tab4_table1[count,13]<<- trendValue$statistic    # Model bias trend statistic
-            tab4_table1[count,14]<<- trendValue$p.value    # Model bias trend p-value
-            tab4_table1[count,15]<<- 0    # Model bias trend at selected significance level? (Y/N)
-          } else {
-            tab4_table1[count,13]<<- NA
-            tab4_table1[count,14]<<- NA
-            tab4_table1[count,15]<<- NA
-          }
+      # Finish out by computing the AIC ratio.  This tells you how likely it is that one model
+      # will minimize information loss compared to another model.
+      
+      for (i in 1:length(arrayAIC)) {
+        if (arrayAIC[i] > 0) {
+          tab4_table1[i,7]<<- exp((minAIC-arrayAIC[i])/2)
         }
       }
-      else if(typeof(model_params)=="character"){
-        if(length(grep("not found",model_params))) {
-          count<<-count+1
-          tab4_table1[count,1] <<- model
-          tab4_table1[count,2] <<- "Given-model not defined"
-          tab4_table1[count,3] <<- "Given-model not defined" 
-          tab4_table1[count,4] <<- "Given-model not defined" 
-          tab4_table1[count,5] <<- "Given-model not defined" 
-          tab4_table1[count,6] <<- "Given-model not defined" 
-          tab4_table1[count,7] <<- "Given-model not defined" 
-          tab4_table1[count,8] <<- "Given-model not defined" 
-          tab4_table1[count,9] <<- "Given-model not defined" 
-          tab4_table1[count,10] <<- "Given-model not defined" 
-          tab4_table1[count,11] <<- "Given-model not defined" 
-          tab4_table1[count,12] <<- "Given-model not defined" 
-          tab4_table1[count,13] <<- "Given-model not defined" 
-          tab4_table1[count,14] <<- "Given-model not defined" 
-          tab4_table1[count,15] <<- "Given-model not defined" 
-        }
-        else {
-          count<<-count + 1
-          tab4_table1[count,1] <<- get(paste0(model, "_fullname"))
-          tab4_table1[count,2] <<- "NON-CONV"
-          tab4_table1[count,3] <<- "NON-CONV"
-          tab4_table1[count,4] <<- "NON-CONV"
-          tab4_table1[count,5] <<- "NON-CONV"
-          tab4_table1[count,6] <<- "NON-CONV"
-          tab4_table1[count,7] <<- "NON-CONV"
-          tab4_table1[count,8] <<- "NON-CONV"
-          tab4_table1[count,9] <<- "NON-CONV"
-          tab4_table1[count,10] <<- "NON-CONV"
-          tab4_table1[count,11] <<- "NON-CONV"
-          tab4_table1[count,12] <<- "NON-CONV"
-          tab4_table1[count,13] <<- "NON-CONV"
-          tab4_table1[count,14] <<- "NON-CONV"
-          tab4_table1[count,15] <<- "NON-CONV"
-        }
-      }
-    }
-    else{
+    } else { 
       # -----> FC data should be handled here
     }
   }
@@ -266,9 +293,8 @@
         if(length(ModelsToEval)>0){
           count <<- 0
           
-          for(i in ModelsToEval){
-            tab4_table1_construct(i,in_data_tab4,ModelEvalsFrame,input)
-          }
+          
+        tab4_table1_construct(ModelsToEval,in_data_tab4,ModelResults,ModelEvalsFrame,input)
 
         tab4_table1 <<- data.frame(tab4_table1[1],tab4_table1[2],tab4_table1[3], tab4_table1[4], tab4_table1[5], tab4_table1[6], tab4_table1[7], tab4_table1[8], tab4_table1[9], tab4_table1[10], tab4_table1[11], tab4_table1[12], tab4_table1[13], tab4_table1[14], tab4_table1[15])
         names(tab4_table1) <<- c("Model","PSSE", "GOF", "GOF p-value", "Model Fit?", "AIC", "AIC Ratio", "-lnPL", "PL Ratio", "Bias", "Bias p-value", "Bias?", "Bias Trend", "Bias Trend p-value", "Bias Trend?")
