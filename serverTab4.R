@@ -15,6 +15,7 @@
       
       minAIC <- Inf
       arrayAIC <- c()
+      Significance <- input$numericEvalSigValue
       
       for (modelName in models_to_eval) {
         #model_params <- try(get(paste(modelName,get(paste(modelName,"methods",sep="_"))[1],"MLE",sep="_"))(get(paste("data"))[[get(paste(modelName,"input",sep="_"))]]),silent=TRUE)
@@ -107,7 +108,11 @@
                 GOFstat <- ks.test(IFsample1, IFsample2)
                 tab4_table1[count,3]<<- GOFstat$statistic     # GOF statistic
                 tab4_table1[count,4]<<- GOFstat$p.value     # GOF p-value
-                tab4_table1[count,5]<<- 0     # Model fits at selected significance level? (Y/N)
+                if (GOFstat$p.value > Significance) {
+                  tab4_table1[count,5]<<- "Yes"     # Model fits at selected significance level? (Yes/No)
+                } else {
+                  tab4_table1[count,5]<<- "No"
+                }
             } else {
               tab4_table1[count,3]<<- NA     # GOF statistic
               tab4_table1[count,4]<<- NA     # GOF p-value
@@ -123,7 +128,11 @@
               biasValue <- ks.test(biasArray, punif)
               tab4_table1[count,10]<<- biasValue$statistic    # Model bias statistic
               tab4_table1[count,11]<<- biasValue$p.value    # Model bias p-value
-              tab4_table1[count,12]<<- 0    # Model bias at selected significance level? (Y/N)
+              if (biasValue$p.value > Significance) {
+                tab4_table1[count,12]<<- "No"     # Model bias at selected significance level? (Yes/No)
+              } else {
+                tab4_table1[count,12]<<- "Yes"
+              }
             } else {
               tab4_table1[count,10]<<- NA
               tab4_table1[count,11]<<- NA
@@ -135,7 +144,11 @@
               trendValue <- ks.test(biasArray, punif)
               tab4_table1[count,13]<<- trendValue$statistic    # Model bias trend statistic
               tab4_table1[count,14]<<- trendValue$p.value    # Model bias trend p-value
-              tab4_table1[count,15]<<- 0    # Model bias trend at selected significance level? (Y/N)
+              if (trendValue$p.value > Significance) {
+                tab4_table1[count,15]<<- "No"     # Model bias trend at selected significance level? (Yes/No)
+              } else {
+                tab4_table1[count,15]<<- "Yes"
+              }
             } else {
               tab4_table1[count,13]<<- NA
               tab4_table1[count,14]<<- NA
